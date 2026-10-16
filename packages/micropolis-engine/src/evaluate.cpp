@@ -79,6 +79,7 @@
 
 
 #include "micropolis.h"
+// Modified 2026-10-16: native engine stability and C++ object lifetime fixes.
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -300,7 +301,7 @@ void Micropolis::voteProblems(const short problemTable[PROBNUM])
             voteCount++;
         }
         problem++;
-        if (problem > PROBNUM) {
+        if (problem >= PROBNUM) {
             problem = 0;
         }
         loopCount++;

@@ -106,10 +106,8 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 #else
-// Native editors and static analyzers may parse the engine without an
-// Emscripten SDK installed. The C++ runtime still targets Emscripten/WASM for
-// JS bindings; this declaration only lets non-Emscripten tooling understand
-// signatures that carry callback context values.
+// Native callbacks carry no JavaScript value. Keep this private compatibility
+// type out of the public C ABI; Emscripten retains its real val unchanged.
 namespace emscripten {
 class val {
 public:
@@ -950,6 +948,10 @@ public:
 
     ~Micropolis();
 
+    // Owns maps, callback and sprites; copying would double-free them.
+    Micropolis(const Micropolis &) = delete;
+    Micropolis &operator=(const Micropolis &) = delete;
+
     void setCallback(Callback *callback, emscripten::val callbackVal);
 
     void init();
@@ -958,6 +960,7 @@ public:
 private:
 
     void destroy();
+    void freeSpriteObjects();
 
     ////////////////////////////////////////////////////////////////////////
     // allocate.cpp
@@ -968,7 +971,7 @@ public:
     /**
      * Callback interface.
      */
-    Callback *callback;
+    Callback *callback = nullptr;
 
 
     /**
@@ -1356,37 +1359,37 @@ public:
     /**
      * Residential population history.
      */
-    short *resHist;
+    short *resHist = nullptr;
 
     /**
      * Commercial population history.
      */
-    short *comHist;
+    short *comHist = nullptr;
 
     /**
      * Industrial population history.
      */
-    short *indHist;
+    short *indHist = nullptr;
 
     /**
      * Money history.
      */
-    short *moneyHist;
+    short *moneyHist = nullptr;
 
     /**
      * Pollution history.
      */
-    short *pollutionHist;
+    short *pollutionHist = nullptr;
 
     /**
      * Crime history.
      */
-    short *crimeHist;
+    short *crimeHist = nullptr;
 
     /**
      * Memory used to save miscelaneous game values in save file.
      */
-    short *miscHist;
+    short *miscHist = nullptr;
 
     //@}
 
@@ -1411,8 +1414,8 @@ private:
     /**
      * Memory for map array.
      */
-    unsigned short *mapBase;
-    unsigned short *mopBase;
+    unsigned short *mapBase = nullptr;
+    unsigned short *mopBase = nullptr;
 
 
     void initMapArrays();
@@ -1756,7 +1759,7 @@ public:
     /**
      * The seed of the most recently generated city.
      */
-    int generatedCitySeed;
+    int generatedCitySeed = {};
 
     void generateSomeRandomCity();
 
@@ -1816,7 +1819,7 @@ public:
     /**
      * @todo Nobody uses this variable. Can it be removed?
      */
-    bool historyInitialized;
+    bool historyInitialized = {};
 
     /**
      * @todo Write-only variable. Can it be removed?
@@ -1955,9 +1958,9 @@ public:
 
 private:
 
-    short *cellSrc;
+    short *cellSrc = nullptr;
 
-    short *cellDst;
+    short *cellDst = nullptr;
 
 
     void simInit();
@@ -2234,7 +2237,7 @@ private:
 public:
 
 
-    SimSprite *spriteList; ///< List of active sprites.
+    SimSprite *spriteList = nullptr; ///< List of active sprites.
 
 
     SimSprite *newSprite(const std::string &name, int type, int x, int y);
@@ -2252,9 +2255,9 @@ public:
 
 private:
 
-    SimSprite *freeSprites; ///< Pool of free #SimSprite objects.
+    SimSprite *freeSprites = nullptr; ///< Pool of free #SimSprite objects.
 
-    SimSprite *globalSprites[SPRITE_COUNT];
+    SimSprite *globalSprites[SPRITE_COUNT] = {};
 
     int absDist;
 
@@ -2353,7 +2356,7 @@ public:
      */
     bool autoBudget;
 
-    Quad messageTimeLast;
+    Quad messageTimeLast = {};
 
     GameLevel gameLevel; ///< Difficulty level of the game (0..2)
 
@@ -2369,7 +2372,7 @@ public:
 
     bool enableDisasters; ///< Enable disasters
 
-    short messageNumber;
+    short messageNumber = {};
 
     bool evalChanged; ///< The evaluation window should be shown to the user
 
@@ -2384,13 +2387,13 @@ public:
      * Hook for scripting language to store scripted callback function.
      * (i.e. a callable Python object.)
      */
-    void *callbackData;
+    void *callbackData = nullptr;
 
     /**
      * Hook for scripting language to store context (i.e. peer object).
      * (i.e. Python SWIG wrapper of this Micropolis object.)
      */
-    void *userData;
+    void *userData = nullptr;
 
 
     /**

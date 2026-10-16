@@ -78,6 +78,7 @@
 
 
 #include "micropolis.h"
+// Modified 2026-10-16: native engine stability and C++ object lifetime fixes.
 #include "text.h"
 
 
@@ -111,7 +112,7 @@ SimSprite *Micropolis::newSprite(const std::string &name, int type, int x, int y
         sprite = freeSprites;
         freeSprites = sprite->next;
     } else {
-        sprite = (SimSprite *)newPtr(sizeof (SimSprite));
+        sprite = new SimSprite{};
     }
 
     sprite->name = name;
@@ -2037,3 +2038,17 @@ void Micropolis::makeExplosionAt( int x, int y)
 
 
 ////////////////////////////////////////////////////////////////////////
+
+// Release both lists, including constructed std::string members. Inactive
+// sprites in the pool are still live C++ objects until the engine releases them.
+void Micropolis::freeSpriteObjects()
+{
+    for (SimSprite **list : {&spriteList, &freeSprites}) {
+        while (*list) {
+            SimSprite *sprite = *list;
+            *list = sprite->next;
+            delete sprite;
+        }
+    }
+    for (auto &sprite : globalSprites) sprite = nullptr;
+}

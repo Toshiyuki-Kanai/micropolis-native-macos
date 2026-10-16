@@ -77,6 +77,8 @@
 
 
 #include "micropolis.h"
+#include <new>
+// Modified 2026-10-16: initialize ownership and release native runtime objects.
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -103,7 +105,13 @@ Micropolis::Micropolis() :
         policeStationEffectMap(0),
         comRateMap(0)
 {
-    initMapArrays();
+    try {
+        initMapArrays();
+        setCallback(new ConsoleCallback(), emscripten::val::null());
+    } catch (...) {
+        destroyMapArrays();
+        throw;
+    }
 }
 
 
@@ -128,7 +136,11 @@ void Micropolis::setCallback(Callback *callback0, emscripten::val callbackVal0)
 /** Initialize simulator variables to a sane default. */
 void Micropolis::init()
 {
-    printf("init");
+    // init() may be called again by a frontend; release previous runtime objects.
+    freeSpriteObjects();
+    freePtr(cellSrc);
+    cellSrc = nullptr;
+    cellDst = nullptr;
     
     ////////////////////////////////////////////////////////////////////////
     // allocate.cpp
@@ -682,7 +694,10 @@ void Micropolis::destroy()
 
     destroyMapArrays();
 
-    // TODO: Clean up all other stuff:
+    freeSpriteObjects();
+    freePtr(cellSrc);
+    cellSrc = nullptr;
+    cellDst = nullptr;
 
 }
 
@@ -1073,7 +1088,9 @@ Quad Micropolis::tickCount()
  */
 Ptr Micropolis::newPtr(int size)
 {
-    return (Ptr)malloc(size);
+    Ptr data = (Ptr)calloc(1, size);
+    if (!data) throw std::bad_alloc();
+    return data;
 }
 
 

@@ -80,6 +80,7 @@
 
 
 #include "micropolis.h"
+// Modified 2026-10-16: native engine stability and C++ object lifetime fixes.
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -120,7 +121,7 @@ void Micropolis::initMapArrays()
 /** Free all map arrays */
 void Micropolis::destroyMapArrays()
 {
-    printf("destroyMapArrays: mapBase: %p\n", mapBase);
+
 
     if (mapBase != NULL) {
         freePtr(mapBase);

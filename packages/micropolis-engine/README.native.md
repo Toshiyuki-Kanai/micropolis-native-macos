@@ -1,0 +1,157 @@
+# MicropolisNative: native C API and macOS integration
+
+The original C++ engine is shared by Emscripten and the native library. The native
+build excludes `src/emscripten.cpp`, `src/callback.cpp`, JavaScript bindings and
+all generated WASM files. It uses `native/callback.cpp` as a silent frontend and
+`native/api.cpp` as the C boundary. No SDL, browser, Python runtime or additional
+native dependencies are required beyond a C/C++17 toolchain, Make and pthreads.
+
+The original [GPL/EA notices](../../MicropolisGPLLicenseNotice.md),
+[GPL](../../gpl-3.0.txt), and [name license](../../MicropolisPublicNameLicense.md)
+still apply. This is a modified version of the engine (2026-10-16), not an EA
+product. Micropolis is a registered trademark of Micropolis Corporation
+(Micropolis GmbH) and is licensed here as a courtesy of the owner under the
+Micropolis Public Name License. See <https://www.micropolis.com>.
+
+## Linux and macOS Make build
+
+Run from the repository root:
+
+```sh
+make -f packages/micropolis-engine/native.mk -j4
+make -f packages/micropolis-engine/native.mk -j4 test
+ASAN_OPTIONS=detect_leaks=0 UBSAN_OPTIONS=halt_on_error=1 \
+  make -f packages/micropolis-engine/native.mk SANITIZE=1 -j4 test
+```
+
+Outputs are ignored under `build/native/` and `build/native-sanitized/`:
+`libmicropolis_native.a`, `core_test`, `api_test`, object files and generated cities.
+The sanitizer setting selects a separate directory to avoid reusing plain objects.
+`BUILD_DIR=/absolute/path/to/build/...`, `CXX=clang++` and `CC=clang` can be set on
+the Make command line. Keep output directories out of source control.
+
+ASan/UBSan remain enabled for the sanitizer run. `detect_leaks=0` is needed in the
+Codex Cloud sandbox because LeakSanitizer fails under its ptrace restrictions;
+it is not evidence that leak checking passed. On a normal Mac or Linux host,
+omit that setting or use `ASAN_OPTIONS=detect_leaks=1` to check leaks as well.
+Do not ignore an actual sanitizer diagnostic.
+
+The tests exercise construction on dirty memory, destruction before init,
+reinitialization, pooled sprite strings, generation, tools/funds, 2,000 ticks,
+pause/resume, haight.cty, all eight bundled scenario files, known-byte city
+fixtures, negative funds, funding fractions, map/mop order, failed I/O, and
+ownership/concurrent reads through a **pure C** consumer.
+
+The historical loader intentionally reseeds the simulation from the clock and
+scans roads/zones on load, refreshing traffic and other derived tiles. Therefore,
+a running city's map is not promised to be bit-for-bit identical after load, nor
+is the random stream continued from the save file. Tests separately verify exact
+serialized bytes, raw decoding, full C/C++ map equivalence on a static fixture,
+and successful simulation of real cities. This retains legacy initialization.
+
+## C interface
+
+Include [`native/include/micropolis_native.h`](native/include/micropolis_native.h).
+The header is C11 compatible and also provides `extern "C"` for C++ consumers.
+It contains the versioned constants, result codes, tool identifiers and snapshot
+layout. No C++ objects, `long`, pointers to engine storage or JS values cross it.
+
+- `mp_create` initializes a funded empty city and transfers ownership of one
+  opaque `MPGame*`. `mp_destroy` releases it; NULL destruction is harmless.
+- `mp_generate` creates a new city with the requested terrain seed and default
+  runtime state. `mp_step`, `mp_set_speed` (0..3) and `mp_set_paused` drive time.
+  Pausing remembers the selected speed; speed 0 is allowed without setting pause.
+- `mp_get_snapshot` copies time, funds, population, speed/pause, date, funding
+  fractions and a conservative revision counter. `mp_set_funding` accepts finite
+  fractions 0..1. The classic format quantizes fractions to 1/65536.
+- `mp_copy_map` copies the main or auxiliary map into caller-owned 12,000-element
+  `uint16_t` storage. Output is **row-major** `y*120+x`, while engine/file storage
+  is column-major `x*100+y`. Values include tile flags; use `value & 0x03ff` for ID.
+- `mp_build` supports road, R/C/I, bulldozer, wire, railway, park and coal power.
+  It delegates footprint, terrain and funding checks to `doTool` and returns
+  distinct errors for insufficient funds, clearing required and other rejection.
+- `mp_load_city` reads 27,120-byte classic and 51,120-byte map+mop files. Failed
+  load leaves the previous engine in place. Successful load starts at speed 3,
+  unpaused, matching the legacy loader's default rather than restoring pause.
+- `mp_save_city` writes map+mop format via a temporary sibling and atomic rename.
+  Failure preserves an existing destination; this is not a power-loss/fsync
+  durability guarantee. The frontend must obtain filesystem/sandbox permission.
+
+Check every `MPResult`. `mp_result_string` returns a static immutable string,
+which the caller must never free. Buffers and C string paths must stay valid
+through the call; the API does not retain them. No C++ exception crosses the ABI.
+After an allocation/internal failure during a mutation, recreate that handle
+because the operation may have partially changed it. Generate/load prepare a new
+engine before replacing the old one, so their failures preserve the current city.
+
+One handle's calls are mutex-serialized. Different handles have independent
+simulation state. The caller must prevent destruction during any operation and
+must not use stale/double-freed handles. Prefer one serial EngineSession per city
+and publish copied state to the UI; do not hold engine pointers in views.
+
+This initial frontend polls state. Sounds, messages, robots, scripted churches,
+manually confirmed budgets and UI dialogs are not exposed yet; its native
+callback adapter is intentionally silent. Automatic budget behavior is the
+engine default. A future interactive frontend needs typed queued events and a
+budget-response operation; rendering alone does not supply those UI features.
+
+## Swift Package and Xcode (Apple Silicon)
+
+`Package.swift` defines:
+
+- `MicropolisNative`: C/C++ library, with the public C header imported as a Clang
+  module. It compiles the shared sources directly, with C++17, without copies.
+- `NativeSmoke`: small Swift command-line example with handle ownership, map
+  copying, loading, road construction and 2,000 simulation ticks. No SwiftUI.
+
+On an M1 or later Mac with Xcode selected, from the repository root:
+
+```sh
+xcode-select -p
+xcrun --sdk macosx --show-sdk-path
+xcrun swift build --package-path packages/micropolis-engine \
+  --scratch-path build/swift-native --arch arm64
+xcrun swift run --package-path packages/micropolis-engine \
+  --scratch-path build/swift-native --arch arm64 NativeSmoke
+xcrun swift run --package-path packages/micropolis-engine \
+  --scratch-path build/swift-native --arch arm64 NativeSmoke \
+  "$PWD/content/micropolis/cities/haight.cty"
+make -f packages/micropolis-engine/native.mk CXX='xcrun clang++' CC='xcrun clang' test
+```
+
+SwiftPM handles the C++ runtime link. With Xcode, add this directory as a **local
+package**, select `MicropolisNative` for the app target, then `import
+MicropolisNative`. Swift C++ interoperability and an Objective-C++ bridge are
+not required. When linking the Make static archive manually, add the public
+header search path/Clang module and link Apple's `libc++` (`-lc++`); build the
+archive with an arm64 Apple Clang target. Do not link Linux `.a` files on macOS.
+No additional engine-specific frameworks are required. The package targets
+macOS 13 or later; only arm64 needs to be built initially.
+
+[`examples/swift/main.swift`](examples/swift/main.swift) is the executable example.
+For a sandboxed app, keep security-scoped URL access active throughout a load or
+save. No city data, graphics or sound assets are copied into the package. Bundle
+only selected resources with confirmed redistribution rights.
+
+The Swift manifest, Clang import and example still require build/run validation
+with Swift/Xcode on Apple Silicon. Linux native tests do not validate macOS SDK,
+arm64 ABI, signing, sandbox integration or SwiftUI rendering.
+
+## Isolated WASM regression
+
+With a working Emscripten toolchain and installed workspace JavaScript dependencies:
+
+```sh
+python3 packages/micropolis-engine/tests/native/verify_wasm.py --emxx em++
+```
+
+This compiles the updated original Web/Embind target under `build/wasm-regression`,
+copies the web app there, substitutes only the copied artifacts, and runs its
+unchanged Vitest/CLI suite. It then builds/runs the shared core tests as wasm32,
+including file-byte and funding checks. The larger stack is only for the C++ test
+program's stack-allocated dirty-storage fixture. Production WASM flags are not
+changed. Original JS/WASM/data hashes are checked even if the runner fails.
+The command never invokes `make install` or modifies existing generated bindings.
+
+The CLI tests use local IPC through tsx, so the host must permit local sockets.
+A socket-permission failure is an environment failure; do not disable those tests.

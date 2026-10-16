@@ -98,136 +98,43 @@
  */
 
 
-#if !defined(__BIG_ENDIAN__)
+// Modified 2026-10-16: explicit big-endian words and signed 32-bit fields.
+// Never alias short arrays as long/Quad: long is 64-bit on macOS/Linux LP64.
+#include <cstdint>
+#include <cmath>
+#include <vector>
+#include <memory>
 
-/**
- * Convert an array of 16-bit values between the save-file byte order and
- * the host byte order.
- *
- * Classic city files are written as big-endian 16-bit words. Little-endian
- * hosts, including WebAssembly, swap every short after read and before write.
- * @param buf Array with shorts.
- * @param len Number of short values in the array.
- */
-#define SWAP_SHORTS(buf, len)        swap_shorts(buf, len)
+static_assert(sizeof(short) == 2, "The classic city format requires 16-bit shorts");
+struct CityFileCloser {
+    void operator()(FILE *file) const noexcept { fclose(file); }
+};
 
-/**
- * Swap the 16-bit halves of 32-bit values stored inside short arrays.
- *
- * Some miscHist fields are 32-bit values packed as two big-endian 16-bit
- * words. After SWAP_SHORTS has made each word host-endian on little-endian
- * targets, the pair still has big-endian word order in memory. HALF_SWAP_LONGS
- * changes that word order so a cast to Quad/long yields the intended number.
- * @param buf Array with longs.
- * @param len Number of long values in the array.
- */
-#define HALF_SWAP_LONGS(buf, len)    half_swap_longs(buf, len)
-
-/**
- * Swap upper and lower byte of all shorts in the array.
- * @param buf Array with shorts.
- * @param len Number of short values in the array.
- */
-static void swap_shorts(short *buf, int len)
+static int32_t read_city_int(const short *words)
 {
-    int i;
-
-    /* Flip bytes in each short! */
-    for (i = 0; i < len; i++) {
-        *buf = ((*buf & 0xFF) <<8) | ((*buf &0xFF00) >>8);
-        buf++;
-    }
+    uint32_t bits = (uint32_t(uint16_t(words[0])) << 16) | uint16_t(words[1]);
+    // Arithmetic conversion also defines negative fields without type punning.
+    return bits <= INT32_MAX ? int32_t(bits)
+                            : int32_t(int64_t(bits) - (int64_t(1) << 32));
 }
 
-
-/**
- * Swap upper and lower words of all longs in the array.
- * @param buf Array with longs.
- * @param len Number of long values in the array.
- */
-static void half_swap_longs(long *buf, int len)
+static void write_city_int(short *words, int32_t value)
 {
-    int i;
-
-    /* Flip 16-bit words in each 32-bit value. The bytes inside each word have
-       already been handled by SWAP_SHORTS. */
-    for (i = 0; i < len; i++) {
-        long l = *buf;
-        *buf =
-            ((l & 0x0000ffff) << 16) |
-            ((l & 0xffff0000) >> 16);
-        buf++;
-    }
+    uint32_t bits = uint32_t(value);
+    uint16_t hi = uint16_t(bits >> 16), lo = uint16_t(bits);
+    words[0] = hi <= INT16_MAX ? short(hi) : short(int(hi) - 65536);
+    words[1] = lo <= INT16_MAX ? short(lo) : short(int(lo) - 65536);
 }
 
-
-#else
-
-
-/**
- * Big-endian host: the file's 16-bit words are already in host order.
- * @param buf Array with shorts.
- * @param len Number of short values in the array.
- * @note This version does not change anything since the data is already in host
- *       order after read, and already in file order before write.
- */
-#define SWAP_SHORTS(buf, len)
-
-/**
- * Big-endian host: 32-bit values packed in miscHist short pairs already have
- * host word order.
- * @param buf Array with longs.
- * @param len Number of long values in the array.
- * @note This version does not change anything since the data is already in host
- *       order after read, and already in file order before write.
- */
-#define HALF_SWAP_LONGS(buf, len)
-
-
-#endif
-
-/**
- * Load an array of short values from file to memory.
- *
- * Convert to the correct processor architecture, if necessary.
- * @param buf Buffer to put the loaded short values in.
- * @param len Number of short values to load.
- * @param f   File handle of the file to load from.
- * @return Load was succesfull.
- */
-static bool load_short(short *buf, int len, FILE *f)
+// Write bytes without modifying live arrays, including on short writes.
+static bool save_short(const short *buf, int len, FILE *f)
 {
-    size_t result = fread(buf, sizeof(short), len, f);
-
-    if ((int)result != len) {
-         return false;
+    for (int i = 0; i < len; ++i) {
+        uint16_t word = uint16_t(buf[i]);
+        unsigned char bytes[2] = {static_cast<unsigned char>(word >> 8),
+                                  static_cast<unsigned char>(word)};
+        if (fwrite(bytes, 1, 2, f) != 2) return false;
     }
-
-    SWAP_SHORTS(buf, len);        /* file big-endian -> host order */
-
-    return true;
-}
-
-
-/**
- * Save an array of short values from memory to file.
- *
- * Convert to the correct endianness first, if necessary.
- * @param buf Buffer containing the short values to save.
- * @param len Number of short values to save.
- * @param f   File handle of the file to save to.
- * @return Save was succesfull.
- */
-static bool save_short(short *buf, int len, FILE *f)
-{
-    SWAP_SHORTS(buf, len);        /* host order -> file big-endian */
-
-    if ((int)fwrite(buf, sizeof(short), len, f) != len) {
-        return false;
-    }
-
-    SWAP_SHORTS(buf, len);        /* restore host order in memory */
-
     return true;
 }
 
@@ -239,66 +146,38 @@ static bool save_short(short *buf, int len, FILE *f)
  */
 bool Micropolis::loadFileData(const std::string &filename)
 {
-    FILE *f;
-    Quad size;
+    std::unique_ptr<FILE, CityFileCloser> file(fopen(filename.c_str(), "rb"));
+    FILE *f = file.get();
+    if (!f) return false;
+    const size_t historyBytes = 6 * HISTORY_LENGTH + MISC_HISTORY_LENGTH;
+    const size_t mapBytes = WORLD_W * WORLD_H * 2;
+    if (fseek(f, 0, SEEK_END) != 0) return false;
+    long size = ftell(f);
+    if (size != long(historyBytes + mapBytes) &&
+        size != long(historyBytes + 2 * mapBytes)) return false;
+    if (fseek(f, 0, SEEK_SET) != 0) return false;
+    std::vector<unsigned char> bytes(static_cast<size_t>(size));
+    bool ok = fread(bytes.data(), 1, bytes.size(), f) == bytes.size();
+    ok = fclose(file.release()) == 0 && ok;
+    if (!ok) return false;
 
-    // Open the file.
-    f = fopen(filename.c_str(), "rb");
-
-    // open() failed; report failure.
-    if (f == NULL) {
-        return false;
-    }
-
-    fseek(f, 0L, SEEK_END);
-    size = ftell(f);
-    fseek(f, 0L, SEEK_SET);
-
-    int mapSizeShort = // 12000
-      WORLD_W * WORLD_H;
-    int mapSize = // 24000
-      mapSizeShort * sizeof(short);
-    int historySize = // 3120
-      (6 * HISTORY_LENGTH) +
-       MISC_HISTORY_LENGTH;
-    int mapFileSize = // 27120
-        historySize + mapSize;
-    int mopFileSize = // 51120
-        historySize + mapSize + mapSize;
-    bool hasMop =
-        size == mopFileSize;
-    bool isValid =
-        hasMop || (size == mapFileSize);
-
-    bool result =
-      isValid &&
-      load_short(resHist, HISTORY_LENGTH / sizeof(short), f) &&
-      load_short(comHist, HISTORY_LENGTH / sizeof(short), f) &&
-      load_short(indHist, HISTORY_LENGTH / sizeof(short), f) &&
-      load_short(crimeHist, HISTORY_LENGTH / sizeof(short), f) &&
-      load_short(pollutionHist, HISTORY_LENGTH / sizeof(short), f) &&
-      load_short(moneyHist, HISTORY_LENGTH / sizeof(short), f) &&
-      load_short(miscHist, MISC_HISTORY_LENGTH / sizeof(short), f) &&
-      /*
-       * Map memory is not row-major by screen row. The engine addresses tiles as
-       * map[x][y], and the contiguous linear order is x * WORLD_H + y: each
-       * column stores all rows before the next column begins. Keep save/load in
-       * that order so files match live mapBase/WASM memory exactly.
-       */
-      load_short((short *)mapBase, mapSizeShort, f) &&
-      (hasMop 
-        ? load_short((short *)mopBase, mapSizeShort, f)
-        : true);
-
-    //printf("loadFileData: mapSize: %d historySize: %d mapFileSize: %d mopFileSize: %d size: %ld hasMop: %d isValid: %d result: %d\n", mapSize, historySize, mapFileSize, mopFileSize, size, hasMop, isValid, result);
-
-    if (!hasMop) {
-        memset(mopBase, 0, WORLD_W * WORLD_H * sizeof(short));
-    }
-
-    fclose(f);
-
-    return result;
+    size_t offset = 0;
+    auto readWords = [&](auto *out, size_t count) {
+        for (size_t i = 0; i < count; ++i) {
+            uint16_t word = (uint16_t(bytes[offset]) << 8) | bytes[offset + 1];
+            offset += 2;
+            // Signed histories preserve the exact 16-bit representation.
+            int value = word <= INT16_MAX ? int(word) : int(word) - 65536;
+            out[i] = value;
+        }
+    };
+    for (short *hist : {resHist, comHist, indHist, crimeHist, pollutionHist, moneyHist})
+        readWords(hist, HISTORY_LENGTH / 2);
+    readWords(miscHist, MISC_HISTORY_LENGTH / 2);
+    readWords(mapBase, WORLD_W * WORLD_H);
+    if (bytes.size() == historyBytes + 2 * mapBytes) readWords(mopBase, WORLD_W * WORLD_H);
+    else memset(mopBase, 0, mapBytes);
+    return true;
 }
 
 /**
@@ -308,31 +187,10 @@ bool Micropolis::loadFileData(const std::string &filename)
  */
 bool Micropolis::loadFile(const std::string &filename)
 {
-    //printf("loadFile: mapBase: %p\n", mapBase);
-    long n;
+    if (!loadFileData(filename)) return false;
 
-    if (!loadFileData(filename)) {
-        return false;
-    }
-
-    /*
-     * 32-bit miscHist fields are stored as pairs of big-endian 16-bit words in
-     * the file. loadFileData has already converted each 16-bit word to host byte
-     * order, so HALF_SWAP_LONGS fixes the remaining word order before reading the
-     * pair as a Quad.
-     *
-     * This applies to funds (50/51), cityTime (8/9), and the fixed-point funding
-     * percentages (58/59, 60/61, 62/63). The funding values are not IEEE floats:
-     * they are int(percent * 65536).
-     */
-
-    n = *(Quad *)(miscHist + 50);
-    HALF_SWAP_LONGS(&n, 1);
-    setFunds(n);
-
-    n = *(Quad *)(miscHist + 8);
-    HALF_SWAP_LONGS(&n, 1);
-    cityTime = n;
+    setFunds(read_city_int(miscHist + 50));
+    cityTime = read_city_int(miscHist + 8);
 
     setAutoBulldoze(miscHist[52] != 0);   // flag for autoBulldoze
     setAutoBudget(miscHist[53] != 0);     // flag for autoBudget
@@ -344,27 +202,11 @@ bool Micropolis::loadFile(const std::string &filename)
     changeCensus();
     mustUpdateOptions = true;
 
-    n = *(Quad *)(miscHist + 58);
-    HALF_SWAP_LONGS(&n, 1);
-    policePercent = ((float)n) / ((float)65536);
-
-    n = *(Quad *)(miscHist + 60);
-    HALF_SWAP_LONGS(&n, 1);
-    firePercent = (float)n / (float)65536.0;
-
-    n = *(Quad *)(miscHist + 62);
-    HALF_SWAP_LONGS(&n, 1);
-    roadPercent = (float)n / (float)65536.0;
-
-    policePercent =
-        (float)(*(Quad*)(miscHist + 58)) /
-        (float)65536.0;   /* and 59 */
-    firePercent =
-        (float)(*(Quad*)(miscHist + 60)) /
-        (float)65536.0;   /* and 61 */
-    roadPercent =
-        (float)(*(Quad*)(miscHist + 62)) /
-        (float)65536.0;   /* and 63 */
+    // Reset transient budget values first, then restore the stored fractions.
+    initFundingLevel();
+    policePercent = clamp(read_city_int(miscHist + 58), int32_t(0), int32_t(65536)) / 65536.0f;
+    firePercent = clamp(read_city_int(miscHist + 60), int32_t(0), int32_t(65536)) / 65536.0f;
+    roadPercent = clamp(read_city_int(miscHist + 62), int32_t(0), int32_t(65536)) / 65536.0f;
 
     cityTime = max((Quad)0, cityTime);
 
@@ -380,7 +222,6 @@ bool Micropolis::loadFile(const std::string &filename)
 
     setSpeed(simSpeed);
     setPasses(1);
-    initFundingLevel();
 
     // Set the scenario id to 0.
     initWillStuff();
@@ -401,27 +242,16 @@ bool Micropolis::loadFile(const std::string &filename)
  */
 bool Micropolis::saveFile(const std::string &filename)
 {
-    long n;
-    FILE *f;
+    // The on-disk fields are signed 32-bit, regardless of the host ABI.
+    if (totalFunds < INT32_MIN || totalFunds > INT32_MAX ||
+        cityTime < INT32_MIN || cityTime > INT32_MAX ||
+        !std::isfinite(policePercent) || !std::isfinite(firePercent) ||
+        !std::isfinite(roadPercent)) return false;
+    FILE *f = fopen(filename.c_str(), "wb");
+    if (!f) return false;
 
-    if ((f = fopen(filename.c_str(), "wb")) == NULL) {
-        /// @todo Report error saving file.
-        return false;
-    }
-
-    /*
-     * Store 32-bit values back into miscHist as big-endian word pairs. We write
-     * the host-order Quad after HALF_SWAP_LONGS so the following save_short()
-     * byte swap emits the classic Mac/network-order file bytes.
-     */
-
-    n = totalFunds;
-    HALF_SWAP_LONGS(&n, 1);
-    (*(Quad *)(miscHist + 50)) = n;
-
-    n = cityTime;
-    HALF_SWAP_LONGS(&n, 1);
-    (*(Quad *)(miscHist + 8)) = n;
+    write_city_int(miscHist + 50, int32_t(totalFunds));
+    write_city_int(miscHist + 8, int32_t(cityTime));
 
     miscHist[52] = autoBulldoze;   // flag for autoBulldoze
     miscHist[53] = autoBudget;     // flag for autoBudget
@@ -430,17 +260,9 @@ bool Micropolis::saveFile(const std::string &filename)
     miscHist[57] = simSpeed;
     miscHist[56] = cityTax;        /* post release */
 
-    n = (int)(policePercent * 65536);
-    HALF_SWAP_LONGS(&n, 1);
-    (*(Quad *)(miscHist + 58)) = n;
-
-    n = (int)(firePercent * 65536);
-    HALF_SWAP_LONGS(&n, 1);
-    (*(Quad *)(miscHist + 60)) = n;
-
-    n = (int)(roadPercent * 65536);
-    HALF_SWAP_LONGS(&n, 1);
-    (*(Quad *)(miscHist + 62)) = n;
+    write_city_int(miscHist + 58, int32_t(clamp(policePercent, 0.0f, 1.0f) * 65536));
+    write_city_int(miscHist + 60, int32_t(clamp(firePercent, 0.0f, 1.0f) * 65536));
+    write_city_int(miscHist + 62, int32_t(clamp(roadPercent, 0.0f, 1.0f) * 65536));
 
     bool result =
         save_short(resHist, HISTORY_LENGTH / 2, f) &&
@@ -458,9 +280,7 @@ bool Micropolis::saveFile(const std::string &filename)
         save_short(((short *)&map[0][0]), WORLD_W * WORLD_H, f) &&
         save_short(((short *)&mop[0][0]), WORLD_W * WORLD_H, f);
 
-    fclose(f);
-
-    return result;
+    return fclose(f) == 0 && result;
 }
 
 

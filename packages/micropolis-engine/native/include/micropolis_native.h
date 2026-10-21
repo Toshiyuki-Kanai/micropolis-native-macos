@@ -34,8 +34,29 @@ typedef int32_t MPTool;
 enum {
     MP_TOOL_ROAD = 1, MP_TOOL_RESIDENTIAL = 2, MP_TOOL_COMMERCIAL = 3,
     MP_TOOL_INDUSTRIAL = 4, MP_TOOL_BULLDOZER = 5, MP_TOOL_WIRE = 6,
-    MP_TOOL_RAILROAD = 7, MP_TOOL_PARK = 8, MP_TOOL_COAL_POWER = 9
+    MP_TOOL_RAILROAD = 7, MP_TOOL_PARK = 8, MP_TOOL_COAL_POWER = 9,
+    MP_TOOL_NUCLEAR_POWER = 10, MP_TOOL_POLICE = 11, MP_TOOL_FIRE = 12,
+    MP_TOOL_STADIUM = 13, MP_TOOL_SEAPORT = 14, MP_TOOL_AIRPORT = 15
 };
+/* Additive gameplay API (2026-10-17). MPSnapshot and ABI v1 stay unchanged.
+ * Hospitals emerge from residential demand; the engine has no school tool. */
+typedef struct MPDetails {
+    int64_t tax_income, road_cost, police_cost, fire_cost, assessed_value;
+    int32_t tax_rate, score, approval, city_class;
+    int32_t powered_zones, unpowered_zones, coal_plants, nuclear_plants;
+    int32_t residential_demand, commercial_demand, industrial_demand;
+    int32_t pollution, crime, traffic, disasters, auto_budget;
+} MPDetails;
+enum { MP_DISASTER_FIRE = 1, MP_DISASTER_FLOOD = 2,
+       MP_DISASTER_TORNADO = 3, MP_DISASTER_EARTHQUAKE = 4,
+       MP_DISASTER_MONSTER = 5, MP_DISASTER_MELTDOWN = 6 };
+MPResult mp_get_details(MPGame *game, MPDetails *out_details);
+/* Automatic annual budgets; engine clamps allocations to available funds.
+ * Rates take effect at the next engine budget calculation. */
+MPResult mp_configure_budget(MPGame *game, int32_t tax_rate,
+                             float police, float fire, float road);
+MPResult mp_set_disasters(MPGame *game, int32_t enabled);
+MPResult mp_trigger_disaster(MPGame *game, int32_t disaster);
 typedef struct MPSnapshot {
     int64_t city_time;
     int64_t funds;

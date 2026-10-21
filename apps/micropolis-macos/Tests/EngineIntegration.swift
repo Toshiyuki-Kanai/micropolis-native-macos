@@ -3,8 +3,8 @@
 import Foundation
 
 enum VerificationError: Error { case failed(String) }
-func expect(_ condition: @autoclosure () -> Bool, _ message: String) throws {
-    if !condition() { throw VerificationError.failed(message) }
+func expect(_ condition: Bool, _ message: String) throws {
+    if !condition { throw VerificationError.failed(message) }
 }
 
 @main struct EngineIntegration {
@@ -50,6 +50,8 @@ func expect(_ condition: @autoclosure () -> Bool, _ message: String) throws {
         print("PASS Swift 2000 ticks: \(initial.time) -> \(advanced.time), pause/resume/speeds")
         try geometry()
         try await modelLifecycle()
+        try await filesAndStrokes()
+        try transformedGeometry()
     }
 
     static func geometry() throws {
@@ -99,4 +101,100 @@ func expect(_ condition: @autoclosure () -> Bool, _ message: String) throws {
         await loop.value
         print("PASS actual CityModel timer/start/stop/pause/resume/speed/cancellation")
     }
+    static func transformedGeometry() throws {
+        let size=CGSize(width:900,height:700)
+        var viewport=MapViewport()
+        let anchor=CGPoint(x:450,y:350)
+        let before=MapGeometry(size:size).tile(at:anchor)!
+        viewport.magnify(4,at:anchor,size:size)
+        viewport.move(CGSize(width:130,height:-90),size:size)
+        for outputSize in [size,CGSize(width:1400,height:700),CGSize(width:900,height:1200)] {
+            viewport.clamp(outputSize)
+            let geometry=MapGeometry(size:outputSize,zoom:viewport.zoom,pan:viewport.pan)
+            for y in geometry.rows { for x in geometry.columns {
+                let rect=geometry.tileRect(x:x,y:y)
+                let p=geometry.tile(at:CGPoint(x:rect.midX,y:rect.midY))
+                try expect(p?.x==Int32(x) && p?.y==Int32(y), "pan/zoom/resize inverse mapping")
+            } }
+        }
+        let zoomed=MapGeometry(size:size,zoom:4).tile(at:anchor)!
+        try expect(before.x==zoomed.x && before.y==zoomed.y,"zoom anchor preservation")
+        let path=MapPath.between(MapPoint(x:2,y:3),MapPoint(x:40,y:21))
+        try expect(path.first==MapPoint(x:2,y:3) && path.last==MapPoint(x:40,y:21),"stroke endpoints")
+        for i in 1..<path.count {
+            try expect(abs(path[i].x-path[i-1].x)+abs(path[i].y-path[i-1].y)==1,"four-connected stroke")
+        }
+        print("PASS pan/zoom/resize coordinate transforms and four-connected drag path")
+    }
+
+    @MainActor static func filesAndStrokes() async throws {
+        let root=URL(fileURLWithPath:CommandLine.arguments[1],isDirectory:true)
+        let output=root.appendingPathComponent("build/gameplay-validation",isDirectory:true)
+        let testFile=output.appendingPathComponent("swift-gameplay.cty")
+        // Native acceptance fixture starts with a funded empty city; clear map
+        // comes from the engine's normal mp_create, never a frontend simulator.
+        let source=root.appendingPathComponent("build/native/gameplay-grown.cty")
+        for tool in BuildTool.allCases {
+            let session=EngineSession()
+            let initial=try await session.execute(.load(source))
+            if tool == .bulldozer { _ = try await session.execute(.build(.road,x:90,y:60)) }
+            let built=try await session.execute(.build(tool,x:90,y:60))
+            try expect(built.funds<initial.funds,"Swift tool mapping and cost: \(tool)")
+        }
+        print("PASS all 15 Swift tool mappings through actual EngineSession")
+        let model=CityModel()
+        try expect(await model.load(source),"load native growth fixture in actual UI model")
+        try expect(!model.dirty && model.frame!.time>0 && model.frame!.populationPending,"load restores time and marks census pending")
+        try expect(await model.configureBudget(tax:8,police:0.4,fire:0.6,road:0.8),"UI budget configuration")
+        try expect(model.dirty && model.frame!.details.taxRate==8,"budget marks document dirty")
+        let original=model.frame!
+        model.tool = .road
+        model.beginStroke(MapPoint(x:80,y:80)); model.extendStroke(MapPoint(x:90,y:84)); model.extendStroke(MapPoint(x:90,y:84)); model.endStroke()
+        try expect(await model.beginDocumentAction(),"file action gate")
+        // beginDocumentAction drains accepted input, even a fast drag.
+        try expect(model.dirty && model.frame!.funds==original.funds-150,"road drag processes 15 unique cells exactly once before save")
+        let saved=model.frame!
+        try expect(await model.save(to:testFile),"coordinated atomic save")
+        try expect(!model.dirty,"successful save clears dirty")
+        model.endDocumentAction()
+        let second=CityModel()
+        try expect(await second.load(testFile),"reopen saved UI city in a new engine")
+        try expect(second.frame!.funds==saved.funds && second.frame!.time==saved.time,"save restores funds/time")
+        try expect(second.frame!.details.taxRate==saved.details.taxRate,"save restores tax")
+        try expect(abs(second.frame!.details.policeFunding-saved.details.policeFunding)<1/65536,"classic 16.16 funding precision")
+        try expect(second.frame!.tiles[80*120+80] & 0x03ff != 0,"save restores road tile")
+        await second.startOrStop()
+        let loop=Task { await second.run() }
+        try await Task.sleep(for:.seconds(1))
+        loop.cancel(); await loop.value
+        try expect(second.frame!.time>saved.time && second.frame!.population>0 && !second.frame!.populationPending && second.dirty,"continue population growth after reopening")
+        let before=try Data(contentsOf:testFile)
+        try expect(!(await second.save(to:output)),"save onto a directory fails")
+        try expect(second.dirty && !second.engineFailed,"save failure keeps unsaved state and valid engine")
+        let after=try Data(contentsOf:testFile)
+        try expect(before==after,"save failure protects prior city file")
+        var external=before; external[0] ^= 1
+        try external.write(to:testFile)
+        try expect(!(await second.save(to:testFile)),"external file change refuses stale overwrite")
+        try expect(try Data(contentsOf:testFile)==external,"external changes protected")
+        try before.write(to:testFile)
+        try expect(second.dirty && !second.engineFailed,"conflict retains unsaved city")
+        try expect(await second.beginDocumentAction(),"document freeze for wire drag")
+        second.endDocumentAction()
+        second.tool = .wire
+        let beforeWire=second.frame!.funds
+        second.beginStroke(MapPoint(x:80,y:85)); second.extendStroke(MapPoint(x:90,y:89)); second.endStroke()
+        try expect(await second.beginDocumentAction(),"drain wire input")
+        try expect(second.frame!.funds==beforeWire-75 && second.dirty,"wire drag processes 15 connected cells and marks dirty")
+        second.endDocumentAction()
+        second.errorMessage=nil
+        let previous=second.frame!
+        try expect(!(await second.load(output.appendingPathComponent("missing.cty"))),"failed load")
+        try expect(second.frame!.funds==previous.funds && second.frame!.time==previous.time && second.dirty,"failed load preserves city and dirty state")
+        let haight=root.appendingPathComponent("content/micropolis/cities/haight.cty")
+        try expect(await second.load(haight),"Swift haight load")
+        try expect(second.frame!.funds==1000000 && second.frame!.time==4839,"classic city decoded")
+        print("PASS actual UI model: drag queue, file gate, save/recreate/load/continue, failed I/O protection, haight")
+    }
+
 }

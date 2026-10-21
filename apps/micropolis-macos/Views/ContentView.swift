@@ -3,99 +3,73 @@ import SwiftUI
 
 struct ContentView: View {
     @Bindable var model: CityModel
-    @State private var confirmNewCity = false
-
+    private var window: NSWindow? { CityWindows.shared.window(for:model) }
     var body: some View {
-        VStack(spacing: 0) {
-            if let frame = model.frame {
-                HStack(spacing: 24) {
-                    Text("資金 \(frame.funds.formatted())")
-                    Text("人口 \(frame.population.formatted())")
-                    Text("\(String(frame.year))年\(frame.month + 1)月")
+        VStack(spacing:0) {
+            if let f=model.frame {
+                HStack(spacing:20) {
+                    Text("資金 \(f.funds.formatted())")
+                    Text(f.populationPending ? "人口 集計待ち" : "人口 \(f.population.formatted())")
+                    Text("\(String(f.year))年\(f.month+1)月")
+                    Text("通電 \(f.details.powered) / 未通電 \(f.details.unpowered)").foregroundStyle(.secondary)
                     Spacer()
-                    Text("時刻 \(frame.time) · \(model.started ? (frame.paused ? "一時停止" : "実行中") : "停止中")")
-                        .foregroundStyle(.secondary)
-                }
-                .monospacedDigit()
-                .padding(12)
+                    Text(model.started ? (f.paused ? "一時停止" : "実行中") : "停止中").foregroundStyle(.secondary)
+                }.monospacedDigit().padding(12)
                 Divider()
-                CityMapView(frame: frame, enabled: model.available) { x, y in
-                    Task { await model.build(x: x, y: y) }
-                }
-                .padding(12)
+                CityMapView(model:model)
             } else {
-                ProgressView("都市を生成しています…").frame(maxWidth: .infinity, maxHeight: .infinity)
+                ProgressView("都市を生成しています…").frame(maxWidth:.infinity,maxHeight:.infinity)
             }
             Divider()
-            HStack {
-                Text(model.message).lineLimit(1)
+            HStack(spacing:12) {
+                Circle().fill(TilePalette.color(for:model.tool)).frame(width:10,height:10)
+                Text("\(model.tool.title) · 基本費用 \(model.tool.baseCost)").fontWeight(.medium)
+                Text(model.message).lineLimit(1).foregroundStyle(.secondary)
                 Spacer()
-                ForEach([BuildTool.road, .residential, .commercial, .industrial]) { tool in
-                    HStack(spacing: 4) {
-                        Rectangle().fill(TilePalette.color(for: tool)).frame(width: 10, height: 10)
-                        Text(tool.title)
-                    }
-                }
-            }
-            .font(.caption)
-            .padding(10)
+                if model.dirty { Text("未保存").foregroundStyle(.secondary) }
+            }.font(.caption).padding(10)
         }
-        .frame(minWidth: 820, minHeight: 600)
+        .frame(minWidth:900,minHeight:600)
+        .navigationTitle(model.title)
+        .background(CityWindowBridge(model:model).frame(width:0,height:0))
         .toolbar {
-            ToolbarItemGroup(placement: .navigation) {
-                Button { confirmNewCity = true } label: { Label("新規都市", systemImage: "plus") }
-                    .disabled(model.busy)
-                Picker("建設ツール", selection: $model.tool) {
-                    ForEach(BuildTool.allCases) { tool in
-                        Label(tool.title, systemImage: tool.symbol).tag(tool)
-                    }
-                }
-                .labelStyle(.titleAndIcon)
-                .frame(width: 150)
-                .disabled(!model.available)
+            ToolbarItemGroup(placement:.navigation) {
+                Button { Task { await CityFiles.newCity(model,window:window) } } label: { Label("新規都市",systemImage:"plus") }.disabled(model.documentBusy)
+                Picker("建設ツール",selection:$model.tool) {
+                    ForEach(BuildTool.allCases) { t in Label(t.title,systemImage:t.symbol).tag(t) }
+                }.labelStyle(.titleAndIcon).frame(width:185).disabled(!model.acceptsMapInput)
             }
-            ToolbarItemGroup(placement: .primaryAction) {
-                Button { Task { await model.startOrStop() } } label: {
-                    Label(model.started ? "停止" : "開始", systemImage: model.started ? "stop.fill" : "play.fill")
-                }
-                .help(model.started ? "停止（都市を保持）" : "開始")
-                .disabled(!model.available)
-                Button { Task { await model.togglePause() } } label: {
-                    Label(model.frame?.paused == true ? "再開" : "一時停止",
-                          systemImage: model.frame?.paused == true ? "play.fill" : "pause.fill")
-                }
-                .help(model.frame?.paused == true ? "再開" : "一時停止")
-                .disabled(!model.available || !model.started)
-                Picker("速度", selection: Binding(
-                    get: { model.frame?.speed ?? 3 },
-                    set: { speed in Task { await model.setSpeed(speed) } }
-                )) {
-                    Text("低速").tag(Int32(1))
-                    Text("中速").tag(Int32(2))
-                    Text("高速").tag(Int32(3))
-                }
-                .frame(width: 100)
-                .disabled(!model.available)
+            ToolbarItemGroup(placement:.primaryAction) {
+                Button { Task { await model.startOrStop() } } label: { Label(model.started ? "停止" : "開始",systemImage:model.started ? "stop.fill" : "play.fill") }.help(model.started ? "停止" : "開始").disabled(!model.available)
+                Button { Task { await model.togglePause() } } label: { Label(model.frame?.paused == true ? "再開" : "一時停止",systemImage:model.frame?.paused == true ? "play.fill" : "pause.fill") }.help("一時停止・再開").disabled(!model.available || !model.started)
+                Picker("速度",selection:Binding(get:{ model.frame?.speed ?? 3 },set:{ value in Task { await model.setSpeed(value) } })) {
+                    Text("低速").tag(Int32(1)); Text("中速").tag(Int32(2)); Text("高速").tag(Int32(3))
+                }.frame(width:95).disabled(!model.available)
+                Toggle(isOn:$model.powerOverlay) { Label("電力表示",systemImage:"bolt") }.help("区域中心: 黄=通電、赤=未通電。導電タイルには黄色の枠。")
+                Menu {
+                    Button("予算・税率…") { model.panel = .budget }
+                    Button("都市評価…") { model.panel = .evaluation }
+                    Button("遊び方…") { model.panel = .guide }
+                } label: { Label("都市情報",systemImage:"info.circle") }
             }
         }
-        .confirmationDialog("現在の都市を破棄して新規都市を作成しますか？", isPresented: $confirmNewCity) {
-            Button("新規都市を作成", role: .destructive) { Task { await model.newCity() } }
-        }
-        .alert("操作できませんでした", isPresented: Binding(
-            get: { model.errorMessage != nil },
-            set: { if !$0 { model.errorMessage = nil } }
-        )) {
-            Button("OK") { model.errorMessage = nil }
+        .sheet(item:$model.panel) { CityPanels(model:model,panel:$0) }
+        .confirmationDialog("\(model.pendingDisaster?.title ?? "災害")を発生させますか？",isPresented:Binding(get:{ model.pendingDisaster != nil },set:{ if !$0 { model.pendingDisaster=nil } })) {
+            if let disaster=model.pendingDisaster {
+                Button("発生させる",role:.destructive) { Task { await model.trigger(disaster) }; model.pendingDisaster=nil }
+            }
+        } message: { Text("都市が被害を受けます。取り消せません。") }
+        .alert("操作できませんでした",isPresented:Binding(get:{ model.errorMessage != nil },set:{ if !$0 { model.errorMessage=nil } })) {
+            Button("OK") { model.errorMessage=nil }
         } message: { Text(model.errorMessage ?? "") }
         .task { await model.run() }
-        .focusedSceneValue(\.cityModel, model)
+        .focusedSceneValue(\.cityModel,model)
     }
 }
-
-struct CityModelFocusKey: FocusedValueKey { typealias Value = CityModel }
+struct CityModelFocusKey: FocusedValueKey { typealias Value=CityModel }
 extension FocusedValues {
     var cityModel: CityModel? {
         get { self[CityModelFocusKey.self] }
-        set { self[CityModelFocusKey.self] = newValue }
+        set { self[CityModelFocusKey.self]=newValue }
     }
 }

@@ -133,8 +133,8 @@ For a sandboxed app, keep security-scoped URL access active throughout a load or
 save. No city data, graphics or sound assets are copied into the package. Bundle
 only selected resources with confirmed redistribution rights.
 
-The Swift manifest, Clang import and example still require build/run validation
-with Swift/Xcode on Apple Silicon. Linux native tests do not validate macOS SDK,
+The Swift manifest, Clang import and example were built and run on Apple M1
+with Xcode 27.1 / Swift 6.4. The native SwiftUI app is in `apps/micropolis-macos`. Linux native tests do not validate macOS SDK,
 arm64 ABI, signing, sandbox integration or SwiftUI rendering.
 
 ## Isolated WASM regression
@@ -155,3 +155,34 @@ The command never invokes `make install` or modifies existing generated bindings
 
 The CLI tests use local IPC through tsx, so the host must permit local sockets.
 A socket-permission failure is an environment failure; do not disable those tests.
+
+## Gameplay API additions (2026-10-17)
+
+The existing ABI version 1 `MPSnapshot`, original tool IDs and .cty format are
+unchanged. New native-only C entry points and the separate `MPDetails` structure:
+
+- `mp_build` additionally accepts nuclear power, police/fire stations, stadium,
+  seaport and airport (tool IDs 10–15). All 15 tools call the existing `doTool`.
+  Hospitals emerge from residential demand; there is no school or manual
+  hospital construction tool. No placeholder tool or frontend map-writing exists.
+- `mp_get_details` copies engine tax income, required service budgets, assessed
+  value, score/approval/class, power counts, demand, crime/pollution/traffic and
+  disaster/automatic-budget flags. Initial loaded-city population/evaluation is
+  refreshed on engine updates; the UI indicates this pending census.
+- `mp_configure_budget` atomically sets tax 0–20 and finite service fractions
+  0–1, enabling automatic budgets. Actual taxation, funding limits and annual
+  spending remain in the engine; there is no new frontend financial model.
+- `mp_set_disasters` controls random disasters. `mp_trigger_disaster` invokes
+  existing fire, flood, tornado, earthquake, monster or meltdown functions.
+  Effect depends on the current city; a successful call does not promise damage.
+
+`native.mk test` now also runs `gameplay_test`: all tools, powered growth,
+save/destroy/recreate/load/continue, fiscal persistence, 328,000 total ticks,
+20 generation/load cycles and six disaster operations. ASan/UBSan are supported
+by the same `SANITIZE=1` target. The shared engine and browser bindings have not
+been changed by these additions. The SwiftUI integration uses scoped URL access
+and NSFileCoordinator. For sandboxed saves, it calls the existing C save API in
+an OS-provided item replacement directory, then uses FileManager to replace or
+move the completed file to the selected URL. The C API's sibling temporary files
+therefore stay inside the replacement directory rather than beside the user's
+selected file. A separate signed sandbox probe verifies this file-grant boundary.

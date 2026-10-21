@@ -57,7 +57,13 @@ $(BUILD_DIR)/api_test.o: $(ENGINE_DIR)/tests/native/api_test.c $(ENGINE_DIR)/nat
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 $(BUILD_DIR)/api_test: $(BUILD_DIR)/api_test.o $(LIBRARY)
 	$(CXX) $^ $(LDFLAGS) -o $@
-test: $(BUILD_DIR)/core_test $(BUILD_DIR)/api_test
+$(BUILD_DIR)/gameplay_test.o: $(ENGINE_DIR)/tests/native/gameplay_test.c $(ENGINE_DIR)/native/include/micropolis_native.h
+	@mkdir -p $(dir $@)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+$(BUILD_DIR)/gameplay_test: $(BUILD_DIR)/gameplay_test.o $(LIBRARY)
+	$(CXX) $^ $(LDFLAGS) -o $@
+test: $(BUILD_DIR)/core_test $(BUILD_DIR)/api_test $(BUILD_DIR)/gameplay_test
 	$(BUILD_DIR)/core_test "$(REPO_DIR)" "$(BUILD_DIR)"
 	$(BUILD_DIR)/api_test "$(REPO_DIR)" "$(BUILD_DIR)"
+	$(BUILD_DIR)/gameplay_test "$(REPO_DIR)" "$(BUILD_DIR)"
 -include $(OBJECTS:.o=.d)

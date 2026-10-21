@@ -6,7 +6,7 @@ struct LicenseView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Micropolis Native macOS").font(.title)
-                Text("2026-10-16に作成した変更版です。Electronic Artsの製品ではありません。")
+                Text("2026-10-17に更新した変更版です。Electronic Artsの製品ではありません。")
                 Text("Copyright (C) 1989–2007 Electronic Arts Inc. (underlying engine)")
                 Text("GPL version 3 or laterおよびEA追加条件の下で提供されます。無保証です。ソースとビルド手順は、このアプリを含むmicropolis-native-macosリポジトリにあります。")
                 Text("Micropolis is a registered trademark of Micropolis Corporation (Micropolis GmbH) and is licensed here as a courtesy of the owner under the Micropolis Public Name License.")

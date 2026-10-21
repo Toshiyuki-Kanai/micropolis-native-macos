@@ -149,6 +149,12 @@ MPResult mp_build(MPGame *game, MPTool tool, int32_t x, int32_t y)
         case MP_TOOL_RAILROAD: selected=TOOL_RAILROAD; break;
         case MP_TOOL_PARK: selected=TOOL_PARK; break;
         case MP_TOOL_COAL_POWER: selected=TOOL_COALPOWER; break;
+        case MP_TOOL_NUCLEAR_POWER: selected=TOOL_NUCLEARPOWER; break;
+        case MP_TOOL_POLICE: selected=TOOL_POLICESTATION; break;
+        case MP_TOOL_FIRE: selected=TOOL_FIRESTATION; break;
+        case MP_TOOL_STADIUM: selected=TOOL_STADIUM; break;
+        case MP_TOOL_SEAPORT: selected=TOOL_SEAPORT; break;
+        case MP_TOOL_AIRPORT: selected=TOOL_AIRPORT; break;
         default: return MP_INVALID_ARGUMENT;
     }
     return access(game, [=](MPGame &g) -> MPResult {
@@ -169,6 +175,57 @@ MPResult mp_load_city(MPGame *game, const char *path)
         g.engine.swap(fresh);
         ++g.revision;
         return MP_OK;
+    });
+}
+// Gameplay additions, 2026-10-17. Delegate all simulation decisions to the core.
+MPResult mp_get_details(MPGame *game, MPDetails *out)
+{
+    if (!out) return MP_INVALID_ARGUMENT;
+    return access(game, [=](MPGame &g) -> MPResult {
+        auto &e = *g.engine; *out = {};
+        out->tax_income=e.taxFund; out->road_cost=e.roadFund;
+        out->police_cost=e.policeFund; out->fire_cost=e.fireFund;
+        out->assessed_value=e.cityAssessedValue; out->tax_rate=e.cityTax;
+        out->score=e.cityScore; out->approval=e.cityYes; out->city_class=e.cityClass;
+        out->powered_zones=e.poweredZoneCount; out->unpowered_zones=e.unpoweredZoneCount;
+        out->coal_plants=e.coalPowerPop; out->nuclear_plants=e.nuclearPowerPop;
+        out->residential_demand=e.resValve; out->commercial_demand=e.comValve;
+        out->industrial_demand=e.indValve; out->pollution=e.pollutionAverage;
+        out->crime=e.crimeAverage; out->traffic=e.trafficAverage;
+        out->disasters=e.enableDisasters; out->auto_budget=e.autoBudget;
+        return MP_OK;
+    });
+}
+MPResult mp_configure_budget(MPGame *game, int32_t tax, float police, float fire, float road)
+{
+    auto valid=[](float f){ return std::isfinite(f) && f>=0 && f<=1; };
+    if (tax<0 || tax>20 || !valid(police) || !valid(fire) || !valid(road)) return MP_INVALID_ARGUMENT;
+    return access(game, [=](MPGame &g) -> MPResult {
+        auto &e=*g.engine;
+        e.setCityTax(short(tax)); e.policePercent=police; e.firePercent=fire; e.roadPercent=road;
+        e.setAutoBudget(true); ++g.revision; return MP_OK;
+    });
+}
+MPResult mp_set_disasters(MPGame *game, int32_t enabled)
+{
+    if (enabled!=0 && enabled!=1) return MP_INVALID_ARGUMENT;
+    return access(game, [=](MPGame &g) -> MPResult {
+        g.engine->setEnableDisasters(enabled!=0); ++g.revision; return MP_OK;
+    });
+}
+MPResult mp_trigger_disaster(MPGame *game, int32_t disaster)
+{
+    if (disaster<MP_DISASTER_FIRE || disaster>MP_DISASTER_MELTDOWN) return MP_INVALID_ARGUMENT;
+    return access(game, [=](MPGame &g) -> MPResult {
+        switch(disaster) {
+            case MP_DISASTER_FIRE: g.engine->makeFire(); break;
+            case MP_DISASTER_FLOOD: g.engine->makeFlood(); break;
+            case MP_DISASTER_TORNADO: g.engine->makeTornado(); break;
+            case MP_DISASTER_EARTHQUAKE: g.engine->makeEarthquake(); break;
+            case MP_DISASTER_MONSTER: g.engine->makeMonster(); break;
+            case MP_DISASTER_MELTDOWN: g.engine->makeMeltdown(); break;
+        }
+        ++g.revision; return MP_OK;
     });
 }
 MPResult mp_save_city(MPGame *game, const char *path)

@@ -1,6 +1,6 @@
 # Micropolis Native macOS — Gameplay / 1.0候補
 
-2026-10-21更新。既存Micropolis C++エンジンを使う、macOS 27以降・Apple Silicon向けの変更版です。Electronic Artsの製品ではありません。Swift 6 / SwiftUI / Canvasと既存のMicropolisNativeローカルSwift Packageを利用し、WebView・Electron・WASMは使用しません。
+2026-10-22更新。既存Micropolis C++エンジンを使う、macOS 27以降・Apple Silicon向けの変更版です。Electronic Artsの製品ではありません。Swift 6 / SwiftUI / Canvasと既存のMicropolisNativeローカルSwift Packageを利用し、WebView・Electron・WASMは使用しません。
 
 ## 起動と基本操作
 
@@ -53,9 +53,13 @@ URLのsecurity-scoped accessとNSFileCoordinatorを使用します。macOSのite
 
 ## 描画と情報
 
-120×100タイルをCanvasで描画します。可視範囲だけを走査し、タイルIDごとにパスをまとめ、12,000個のSwiftUI Viewは生成しません。独自の単色・幾何学模様・文字だけを使用し、権利不明の画像・音声は同梱しません。
+GPL公開版Micropolisの16×16タイル画像をCanvasで描画します。公開元の固定Commitから取得したtiles.xpmを無損失でPNGへ変換し、原本・出典・GPL／EA追加条件をアプリのOriginalGraphicsフォルダに同梱します。ライセンスとクレジット画面から文書を参照できます。既存の合成画像・追加タイルセットは使用しません。
 
-道路は灰色、交通量増加で茶・赤、鉄道は灰色の枠、送電線は黄色。住宅は緑、商業は水色、工業は橙色。高ズームでは発展した建物の模様と区域中心のR/C/Iや施設名を表示します。赤枠は未通電区域の中心です。
+タイルIDは状態フラグを除いた下位10ビットです。0〜955の原画像を使用し、現エンジンの拡張教会等（956〜1023）は簡易色表示へ戻します。画像を読み込めない場合も簡易描画で操作を継続できます。区域の発展やインフラの接続はエンジンが返したIDに従って表示します。
+
+16×16タイル単位の画像区画をactor上で組み立て、可視範囲だけをCanvasへ描きます。画像番号が変わった区画だけを再生成し、パン・ズームではキャッシュを再利用します。Retinaの画面座標と画像の画素を分離し、画像補間を無効にしてドット絵を維持します。12,000個のSwiftUI Viewは作りません。建設プレビュー・電力表示は画像の上に重ねます。
+
+火災・交通・噴水・煙・レーダー・スタジアム・原子力施設等のタイルアニメーションは既存C++のanimateTiles()を約100msごとに呼びます。一時停止・停止時は静止します。元のテーブルで静止している水面・森林は静止のままです。列車・船・航空機・怪獣等の移動スプライト表示は今回追加していません。
 
 電力表示をオンにすると、区域中心は通電なら黄・未通電なら赤になります。その他の導電タイルには黄色の枠を表示します。導電タイルの枠自体は通電保証ではありません。通電区域数・未通電区域数はエンジンの集計値です。
 
@@ -74,6 +78,7 @@ URLのsecurity-scoped accessとNSFileCoordinatorを使用します。macOSのite
 ./apps/micropolis-macos/script/verify_engine.sh
 bash ./apps/micropolis-macos/script/verify_sandbox_save.sh
 bash ./apps/micropolis-macos/script/verify_window_lifecycle.sh
+bash ./apps/micropolis-macos/script/verify_graphics.sh
 make -f packages/micropolis-engine/native.mk SANITIZE=1 -j4 \
   CXX='xcrun clang++ -arch arm64' CC='xcrun clang -arch arm64' test
 ```
@@ -95,6 +100,8 @@ C++/C APIは既存回帰に加え、全15ツール、電力・人口成長、保
 中心となる受け入れ手順「新規→道路・RCI→発電・送電→成長→税率・予算変更→保存→終了→再起動して開く→継続」は確認済みです。最近使った都市、全15ツールと災害の個別操作、閉じた都市ウインドウの再表示など、報告に含まれない操作を実機確認済みとは扱いません。1.0候補としてソースを公開し、配布用署名・公証済みの製品とは区別します。
 
 未実装：Undo、自動保存、移動スプライト描画・音声・通知イベント一覧、グラフ／密度マップ、シナリオUI、地形編集UI、手動年次予算承認、配布用署名・公証。スプライトを持つ災害の破壊処理は動きますが、怪獣等の姿は描きません。長時間試験は328,000 tickの加速実行であり、数時間のGUI連続稼働を保証するものではありません。
+
+画像の出典・除外素材・タイル対応・今回の検証範囲は[グラフィック統合記録](../../documentation/notes/engine/native-macos-original-graphics.ja.md)を参照してください。2026-10-22、原画像版について建設・接続、パン・ピンチ、建設プレビュー、電力表示、アニメーションと停止・再開、保存後の継続、ライセンス画面がすべて正常とのユーザー実機確認を受けました。これは今回の原画像版での確認結果であり、Codexの自動試験とは区別します。
 
 ## ライセンス
 

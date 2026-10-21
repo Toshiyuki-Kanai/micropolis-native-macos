@@ -1,0 +1,6 @@
+# Verbatim upstream inputs: provenance hashes require byte-for-byte preservation.
+Resources/OriginalGraphics/tiles.xpm -text
+Resources/OriginalGraphics/UPSTREAM-COPYING.txt -text
+# The original README contains trailing spaces and a final blank line.
+# Exempt only that upstream document, never authored source or tests.
+Resources/OriginalGraphics/UPSTREAM-README.txt -text whitespace=-blank-at-eol,-blank-at-eof

@@ -74,6 +74,9 @@ actor EngineSession {
             var before=MPSnapshot()
             try check(mp_get_snapshot(pointer,&before))
             try check(mp_step(pointer,ticks))
+            // Exactly one visual frame per UI update, independent of the tick
+            // batch size. The C++ core owns animation IDs and status flags.
+            if ticks>0 { try check(mp_animate_tiles(pointer)) }
             if ticks>=8, before.paused==0, before.speed>0 { awaitingCensus=false }
         case let .paused(paused): try check(mp_set_paused(pointer, paused ? 1 : 0))
         case let .speed(speed): try check(mp_set_speed(pointer, speed))

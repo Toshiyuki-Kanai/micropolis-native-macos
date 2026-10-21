@@ -186,3 +186,13 @@ an OS-provided item replacement directory, then uses FileManager to replace or
 move the completed file to the selected URL. The C API's sibling temporary files
 therefore stay inside the replacement directory rather than beside the user's
 selected file. A separate signed sandbox probe verifies this file-grant boundary.
+
+## Original tile animation (2026-10-21)
+
+`mp_animate_tiles` advances one visual frame with the existing C++
+`animateTiles()` table. It preserves map status flags and does not advance city
+time or change funds. Paused cities, speed zero and disabled animation are
+unchanged. `mp_step` retains its existing contract; the macOS EngineSession calls
+the new function once after each nonempty tick batch (normally 100 ms).
+`animation_test` checks all 1024 IDs and 32 frames against the existing core.
+No shared simulation logic, Web/WASM binding or .cty format is changed.

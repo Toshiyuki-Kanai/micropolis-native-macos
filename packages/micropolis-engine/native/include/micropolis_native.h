@@ -57,6 +57,9 @@ MPResult mp_configure_budget(MPGame *game, int32_t tax_rate,
                              float police, float fire, float road);
 MPResult mp_set_disasters(MPGame *game, int32_t enabled);
 MPResult mp_trigger_disaster(MPGame *game, int32_t disaster);
+/* One visual animation frame using the existing core table; no simulation tick.
+ * No-op while paused or at speed zero. Preserves all map status flags. */
+MPResult mp_animate_tiles(MPGame *game);
 typedef struct MPSnapshot {
     int64_t city_time;
     int64_t funds;

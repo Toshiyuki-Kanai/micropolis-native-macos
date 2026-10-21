@@ -244,4 +244,14 @@ MPResult mp_save_city(MPGame *game, const char *path)
         return MP_OK;
     });
 }
+MPResult mp_animate_tiles(MPGame *game)
+{
+    return access(game, [](MPGame &g) -> MPResult {
+        auto &e=*g.engine;
+        if (!e.simPaused && e.simSpeed>0 && e.doAnimation) {
+            e.animateTiles(); ++g.revision;
+        }
+        return MP_OK;
+    });
+}
 }

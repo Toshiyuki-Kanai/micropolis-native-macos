@@ -1,0 +1,40 @@
+{
+  "repository": "https://github.com/SimHacker/micropolis",
+  "commit": "c98f6b08519887b450d9be198bfca5237aab6d0c",
+  "license": "GPL-3.0-or-later with EA additional terms",
+  "copyright": "Copyright (C) 1989-2007 Electronic Arts Inc.",
+  "evidence": "UPSTREAM-README.txt lines 22-92 explicitly cover images/* and include the EA terms",
+  "assets": [
+    {
+      "file": "tiles.xpm",
+      "sourcePath": "micropolis-activity/images/tiles.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/tiles.xpm",
+      "sha256": "5a2432b42112aa1e904c736e362f75bc902e8c60adf69f4c965995f869ef6cbb",
+      "gitBlob": "f9db51d1ca0992b65d6e80e30ca407bd4b1c6576"
+    },
+    {
+      "file": "UPSTREAM-README.txt",
+      "sourcePath": "micropolis-activity/README",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/README",
+      "sha256": "1d2b942bf5f657b85c07385f90049fa5caf3345cdeed2d49e59ce34dc8625d39",
+      "gitBlob": "ba9736f7d621b1bf30a30d2adcbd15eb23ae0eeb"
+    },
+    {
+      "file": "UPSTREAM-COPYING.txt",
+      "sourcePath": "micropolis-activity/COPYING",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/COPYING",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "gitBlob": "94a9ed024d3859793618152ea559a168bbcbb5e2"
+    }
+  ],
+  "generated": {
+    "file": "tiles.png",
+    "source": "tiles.xpm",
+    "width": 16,
+    "height": 15360,
+    "tileSize": 16,
+    "tileCount": 960,
+    "rgbaSHA256": "5017ef5e6dbe3b2bdf51d1d0b5bcd838876ee6f810adbeedd8cf697babd359c9",
+    "sha256": "ce6a7824c6ee11afc10349c3b2df721c8e4606ecc6f3ee15186f5b8db4b0c8c7"
+  }
+}

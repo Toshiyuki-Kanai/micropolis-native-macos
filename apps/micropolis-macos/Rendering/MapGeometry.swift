@@ -58,6 +58,13 @@ struct MapViewport {
 
 /// Four-connected line, so road/wire drag never leaves diagonal gaps.
 enum MapPath {
+    static func rectangle(_ a: MapPoint,_ b: MapPoint,spacing: Int) -> [MapPoint] {
+        let step=max(1,spacing), sx=b.x>=a.x ? step : -step, sy=b.y>=a.y ? step : -step
+        let columns=abs(Int(b.x-a.x))/step+1, rows=abs(Int(b.y-a.y))/step+1
+        return (0..<rows).flatMap { row in (0..<columns).map { column in
+            MapPoint(x:a.x+Int32(column*sx),y:a.y+Int32(row*sy))
+        } }
+    }
     static func between(_ a: MapPoint, _ b: MapPoint) -> [MapPoint] {
         var x=a.x, y=a.y
         let dx=abs(b.x-x), dy=abs(b.y-y), sx: Int32=x<b.x ? 1 : -1, sy: Int32=y<b.y ? 1 : -1

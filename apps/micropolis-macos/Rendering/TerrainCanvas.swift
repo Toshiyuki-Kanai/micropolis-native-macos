@@ -27,6 +27,7 @@ struct TileMapCanvas: View {
     let geometry: MapGeometry
     let power: Bool
     let chunks: [TileChunk]
+    var spriteAtlas=SpriteAtlas.bundled
     var asynchronous=true
     var body: some View {
         Canvas(opaque:false,rendersAsynchronously:asynchronous) { context,_ in
@@ -68,6 +69,16 @@ struct TileMapCanvas: View {
                     }
                 }
             } }
+            for sprite in frame.civic.sprites {
+                let scale=g.tileSize/16
+                let rect=CGRect(x:g.rect.minX+CGFloat(sprite.x+sprite.offsetX)*scale,
+                                y:g.rect.minY+CGFloat(sprite.y+sprite.offsetY)*scale,
+                                width:CGFloat(sprite.width)*scale,height:CGFloat(sprite.height)*scale)
+                if rect.intersects(CGRect(origin:.zero,size:g.viewport)),
+                   let image=spriteAtlas.image(kind:sprite.kind,frame:sprite.frame) {
+                    context.draw(Image(decorative:image,scale:1,orientation:.up).interpolation(.none),in:rect)
+                }
+            }
         }
     }
 }

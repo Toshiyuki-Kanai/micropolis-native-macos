@@ -1,0 +1,485 @@
+{
+  "repository": "https://github.com/SimHacker/micropolis",
+  "commit": "c98f6b08519887b450d9be198bfca5237aab6d0c",
+  "license": "GPL-3.0-or-later with EA additional terms",
+  "copyright": "Copyright (C) 1989-2007 Electronic Arts Inc.",
+  "evidence": "../UPSTREAM-README.txt includes images/* and res/sounds/*; ../UPSTREAM-COPYING.txt",
+  "assets": [
+    {
+      "file": "obj1-0.xpm",
+      "sourcePath": "micropolis-activity/images/obj1-0.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj1-0.xpm",
+      "gitBlob": "5caa2aedd94be0e164b722eb09e7aff3c03a399e",
+      "sha256": "18254332f8f6adf49e90c36c112960438e8335a63842d77fe672ce6a3d6f058f"
+    },
+    {
+      "file": "obj1-1.xpm",
+      "sourcePath": "micropolis-activity/images/obj1-1.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj1-1.xpm",
+      "gitBlob": "df6fee86f7da57bc3bbad81842c3e6ceec4335b2",
+      "sha256": "4cb830f710e4d1ecd1c37ea972c1782a4bab98c34bf10784df3f5a35bfa31d16"
+    },
+    {
+      "file": "obj1-2.xpm",
+      "sourcePath": "micropolis-activity/images/obj1-2.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj1-2.xpm",
+      "gitBlob": "f11e6913ae5e4c098005e76341a8d45496520ca0",
+      "sha256": "907d7beab8b3e3dd89d6383c9cca800022bca4e9fc19f540c7689974905af1b7"
+    },
+    {
+      "file": "obj1-3.xpm",
+      "sourcePath": "micropolis-activity/images/obj1-3.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj1-3.xpm",
+      "gitBlob": "0a49af178a614551b731eb2d3e1fa1fc49f55b75",
+      "sha256": "ce36f238b40c2ded27e0ecd4b96dc75f433b3c0ba83dcf59eb76b26825b0512b"
+    },
+    {
+      "file": "obj1-4.xpm",
+      "sourcePath": "micropolis-activity/images/obj1-4.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj1-4.xpm",
+      "gitBlob": "f9314373f65148d0eb9e348949d7dff3eb43c2b4",
+      "sha256": "f4da90d6d2545a4f46b5a4c991339b2d8f7b01402097953bc8708063be941ce1"
+    },
+    {
+      "file": "obj2-0.xpm",
+      "sourcePath": "micropolis-activity/images/obj2-0.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj2-0.xpm",
+      "gitBlob": "c860a6b960328aa55581186a9a204df10ce2e8b3",
+      "sha256": "fc2777ad9bd683a266c1c8854b2813d399be5ee45f97f75aa5a45f2c37ab4db7"
+    },
+    {
+      "file": "obj2-1.xpm",
+      "sourcePath": "micropolis-activity/images/obj2-1.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj2-1.xpm",
+      "gitBlob": "b5241262e61dd57d3661f23c8d66be610b35e86b",
+      "sha256": "eb3cceb0f89c1089320c566f0aaf6815ee7a4baf918984c8d8d6e2246be55196"
+    },
+    {
+      "file": "obj2-2.xpm",
+      "sourcePath": "micropolis-activity/images/obj2-2.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj2-2.xpm",
+      "gitBlob": "5a35956c554d5b3516ffa1afbbcc47074f56d00c",
+      "sha256": "dffa007ac61be6cd656e59df1764d910180ecf42e2cd495db93d820a32559e80"
+    },
+    {
+      "file": "obj2-3.xpm",
+      "sourcePath": "micropolis-activity/images/obj2-3.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj2-3.xpm",
+      "gitBlob": "9cffdefbb5bbb99052344f639caf4692356702ac",
+      "sha256": "e2b90be5aa4a561357c3dea5e64a11be8d4977c41ca441633c32400bf0253688"
+    },
+    {
+      "file": "obj2-4.xpm",
+      "sourcePath": "micropolis-activity/images/obj2-4.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj2-4.xpm",
+      "gitBlob": "88108e36a970ca78d2e783d384b7f4ac9fb220d2",
+      "sha256": "b5eae95ffa5be20200f62175db6ed32410aaa77e2c2f7154feca8f9888d7e798"
+    },
+    {
+      "file": "obj2-5.xpm",
+      "sourcePath": "micropolis-activity/images/obj2-5.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj2-5.xpm",
+      "gitBlob": "6447e8d7005149b6ab50ae10f2f7fe4ec6448f78",
+      "sha256": "3a755e68938d0f1e80c2d8667aeba36b230b435d364124cba9b1453e1b4c6f8a"
+    },
+    {
+      "file": "obj2-6.xpm",
+      "sourcePath": "micropolis-activity/images/obj2-6.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj2-6.xpm",
+      "gitBlob": "2c90fce94524997b3d620de533e82715dd244d88",
+      "sha256": "385bf39cf6781324777971e31eaa2e69b26e0bc5716752fea0731dac40cda94f"
+    },
+    {
+      "file": "obj2-7.xpm",
+      "sourcePath": "micropolis-activity/images/obj2-7.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj2-7.xpm",
+      "gitBlob": "2d545550b9331a3b4087d507a2a0a69b3c549077",
+      "sha256": "fa07cf468fbf5ea2f5f003765867ca8e2099a700e0eb8d13e0311bb20ce17c90"
+    },
+    {
+      "file": "obj3-0.xpm",
+      "sourcePath": "micropolis-activity/images/obj3-0.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj3-0.xpm",
+      "gitBlob": "044ecf02cf3beffd3c03fd7b02bc09272c067448",
+      "sha256": "54ddc84a731bf771ed08ba4d5ae88de9ee6ab4d68ab9079b6124a483bf8c5900"
+    },
+    {
+      "file": "obj3-1.xpm",
+      "sourcePath": "micropolis-activity/images/obj3-1.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj3-1.xpm",
+      "gitBlob": "777e7ef2ba8a4bc6532d9c9eb595b9a80a5a6976",
+      "sha256": "74f702d49dc07cf004576d30b54fa1ed59989313fedf45569244234a7ec2f941"
+    },
+    {
+      "file": "obj3-10.xpm",
+      "sourcePath": "micropolis-activity/images/obj3-10.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj3-10.xpm",
+      "gitBlob": "f5105c6e91c0ec7b893813bb74ed10d08fcb3697",
+      "sha256": "ec8a5aa2edec3b81bf4ff62423c0344ab0a56127424c937bbe088caf3f28301c"
+    },
+    {
+      "file": "obj3-2.xpm",
+      "sourcePath": "micropolis-activity/images/obj3-2.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj3-2.xpm",
+      "gitBlob": "160a4658944301b7e080c48e0155ec0501343bed",
+      "sha256": "d29b72013c61c56e74400d3c767441a2ce8bb878d4f9fd033b15af030685b3fb"
+    },
+    {
+      "file": "obj3-3.xpm",
+      "sourcePath": "micropolis-activity/images/obj3-3.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj3-3.xpm",
+      "gitBlob": "cf566e755778e19572dbd440ae6848d4c6d3b847",
+      "sha256": "dec6dfcb696f70c1d9618b31a029e517af8a3a2e7b1ced7d4f662fb59f73cb66"
+    },
+    {
+      "file": "obj3-4.xpm",
+      "sourcePath": "micropolis-activity/images/obj3-4.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj3-4.xpm",
+      "gitBlob": "30c9a223e9b3bd498fc5f335995bcabf32f805d5",
+      "sha256": "73da486aad09aaeb41b8f320296205b75d26e35ecf5a8f48a2f77934ca84f1e5"
+    },
+    {
+      "file": "obj3-5.xpm",
+      "sourcePath": "micropolis-activity/images/obj3-5.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj3-5.xpm",
+      "gitBlob": "7cac8bd1ceecb8b20a6b78323fba2baaa63d90eb",
+      "sha256": "1185ca53ed164dd4de65779f89474568638169f89304698be8cecb8c3b454383"
+    },
+    {
+      "file": "obj3-6.xpm",
+      "sourcePath": "micropolis-activity/images/obj3-6.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj3-6.xpm",
+      "gitBlob": "a5dab9d45022425d06bc24dd5bf865a681e67427",
+      "sha256": "58557bddfba7af70e8df486a584d1b2b6501b5e27cbbb8367bc48aec30db6645"
+    },
+    {
+      "file": "obj3-7.xpm",
+      "sourcePath": "micropolis-activity/images/obj3-7.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj3-7.xpm",
+      "gitBlob": "631debd9c03f50643a589468c6d28ac51a0947df",
+      "sha256": "3cb81a0a5fcdb54c4ee2ba15aec5754da325d6c1f6ead6c874031db2f4c29116"
+    },
+    {
+      "file": "obj3-8.xpm",
+      "sourcePath": "micropolis-activity/images/obj3-8.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj3-8.xpm",
+      "gitBlob": "c52be87add99059c3cf294e9420fb96ddb86bd55",
+      "sha256": "ff0b51d5eb981bb6c80dc7110a426a08f62a9fc98dcb8e5da87c8d44d99a269e"
+    },
+    {
+      "file": "obj3-9.xpm",
+      "sourcePath": "micropolis-activity/images/obj3-9.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj3-9.xpm",
+      "gitBlob": "87f3c40532422d09749e29acb2000febad9bc557",
+      "sha256": "e500f106600f78ebd4cae1f2e2f088dbfdc9669f46a26827b00f5cef81e776f0"
+    },
+    {
+      "file": "obj4-0.xpm",
+      "sourcePath": "micropolis-activity/images/obj4-0.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj4-0.xpm",
+      "gitBlob": "e704d06132112462a698a3e3aec1c82149c7a106",
+      "sha256": "a9f20308844e05be74de93d2cddc9edab557140ff84ea905c82f4d7e79dc963f"
+    },
+    {
+      "file": "obj4-1.xpm",
+      "sourcePath": "micropolis-activity/images/obj4-1.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj4-1.xpm",
+      "gitBlob": "49accd76f2b8c0a18370b4aeace2e86d35b89d08",
+      "sha256": "8d554badf5054f1a2327c2b025d0de2075108cb5f387400e9b1658a323e43a5d"
+    },
+    {
+      "file": "obj4-2.xpm",
+      "sourcePath": "micropolis-activity/images/obj4-2.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj4-2.xpm",
+      "gitBlob": "15f7cd3da529837020af7cc8dd0bb25165880b26",
+      "sha256": "5742efd0a88e248d1c2ff02177de5512d6e7a73db759edcc0b7ad454ea503992"
+    },
+    {
+      "file": "obj4-3.xpm",
+      "sourcePath": "micropolis-activity/images/obj4-3.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj4-3.xpm",
+      "gitBlob": "917f862279f0b8874ccb8ed589239043885e4963",
+      "sha256": "39f61c981221946206530f6a8ed4e6e5da27a6d5fcc95ef28466899e972394a1"
+    },
+    {
+      "file": "obj4-4.xpm",
+      "sourcePath": "micropolis-activity/images/obj4-4.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj4-4.xpm",
+      "gitBlob": "287e1a8b81b8593b0754cd0f6cb000bb7ab5d08b",
+      "sha256": "6f10e97bcbc109e16b8fb6a3692a5a1c1fc1203eb23ea76f1fbf9c426e57b351"
+    },
+    {
+      "file": "obj4-5.xpm",
+      "sourcePath": "micropolis-activity/images/obj4-5.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj4-5.xpm",
+      "gitBlob": "536a1e9a652e179626241823d06c12f3c433feb6",
+      "sha256": "1317796b9ea49aafd9f256146553f1860c4f587e77f8bd79a34dd7d5a8a3d1af"
+    },
+    {
+      "file": "obj4-6.xpm",
+      "sourcePath": "micropolis-activity/images/obj4-6.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj4-6.xpm",
+      "gitBlob": "cae6d4ab889db57250bb37e3f5ec4321c5b291b4",
+      "sha256": "6752df0cb4ab146a55ea97a13da42327ee008fa6342a6f05f4387115f68fc5ef"
+    },
+    {
+      "file": "obj4-7.xpm",
+      "sourcePath": "micropolis-activity/images/obj4-7.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj4-7.xpm",
+      "gitBlob": "6c5dfee00dc96e755833d25cbd0f2d8eed8a3e60",
+      "sha256": "77306e8c070cbff3cc374c7422a661211b5388825a5d1c61ba020e604f08a7e3"
+    },
+    {
+      "file": "obj5-0.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-0.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-0.xpm",
+      "gitBlob": "1cbf74ac16c3c2283ecf0e3954c89bec526eb7ff",
+      "sha256": "980afa55e6d25f6f31830d356c36cdd61822a3062d9a4758bf5f432c490c2bc4"
+    },
+    {
+      "file": "obj5-1.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-1.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-1.xpm",
+      "gitBlob": "40c1b3b7aa83001686a34ad8ac97a2603df4467c",
+      "sha256": "b465f22499806014c4f44af4745c9cd40bf5f413b95af57bacaec541543bc11f"
+    },
+    {
+      "file": "obj5-10.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-10.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-10.xpm",
+      "gitBlob": "fa302d33935b4f25ba87c4c61f8f56f247950d92",
+      "sha256": "f9ec910981ea9671e91d2d47f454034537eb963cef9f1b55c43fc98bea0a77df"
+    },
+    {
+      "file": "obj5-11.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-11.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-11.xpm",
+      "gitBlob": "aaed0d19db71414bc6f354bf00bd86aec2d47d16",
+      "sha256": "c96de8bc6030a746c1977922c5b716efccc93fab558e8a74eb8de2e6bf5b51a0"
+    },
+    {
+      "file": "obj5-12.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-12.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-12.xpm",
+      "gitBlob": "17b048ba7d810b729b9141d3fdf782fbe02a1d9a",
+      "sha256": "1a402d0cd6efb63ff2e9db2d86206bac874bf3c5a3857d6cf6542a0fc56703fb"
+    },
+    {
+      "file": "obj5-13.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-13.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-13.xpm",
+      "gitBlob": "efdee409eea173c19ecf2594195c9d83c6070d1a",
+      "sha256": "2eb423303f714afec953a718f71d87680d1e813e3fcf9af6f5dde7e72e090a18"
+    },
+    {
+      "file": "obj5-14.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-14.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-14.xpm",
+      "gitBlob": "b8d3e93d122fbef31cf84f0783a67a63b48a42d0",
+      "sha256": "7a82aecbf05dae80b27b19191606d81376616666ad5e90c8475f52d40ae5a798"
+    },
+    {
+      "file": "obj5-15.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-15.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-15.xpm",
+      "gitBlob": "d32abe11baec121f73bc42f62d6d01df8d881251",
+      "sha256": "0590dc50cffda849f723e75d5f4f3070e33dcab3662635b1bb2c951e59a0e09d"
+    },
+    {
+      "file": "obj5-2.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-2.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-2.xpm",
+      "gitBlob": "fb3bc76d956b29d6f26d16e2c9bc5f40149befeb",
+      "sha256": "4b3fd64e103e6071541502bcd4572bdeca54d0c19e1216d443bfdc0b5dca525d"
+    },
+    {
+      "file": "obj5-3.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-3.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-3.xpm",
+      "gitBlob": "35e0da1ed849759e33a35a37d123868e8a6f6b2b",
+      "sha256": "300c7471e99d708106ff10d496f06695b3c1c69b0ffb348551ab98a35f57e1cf"
+    },
+    {
+      "file": "obj5-4.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-4.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-4.xpm",
+      "gitBlob": "0dd2b6b25f077d2d5fa6e5b132c57ea9e0ce4c28",
+      "sha256": "c6a2000db8de851c0bb8c42b1b7922426de5b9ff16c241ced1a4133db46c8447"
+    },
+    {
+      "file": "obj5-5.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-5.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-5.xpm",
+      "gitBlob": "8f9ab99c9f3168dbedf885c4217ab34630f6ba58",
+      "sha256": "d73763cb6d65511e457650a28ab94087f5b412e8b8fb5218fb06c136f7182a93"
+    },
+    {
+      "file": "obj5-6.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-6.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-6.xpm",
+      "gitBlob": "fdcecd88cfde1c151ec0472bf020ccc693d67c4a",
+      "sha256": "2a02970acaf444fd900176d9ab553b3418072572b087c10c92a1dd7de0b69aa3"
+    },
+    {
+      "file": "obj5-7.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-7.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-7.xpm",
+      "gitBlob": "72ee3283af4babb0bf513fb23dd4e8ec0466f53e",
+      "sha256": "0f80ef7c855384c09c61e6b1b420f91c61c1e3c430d6c73400be36b1a226c401"
+    },
+    {
+      "file": "obj5-8.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-8.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-8.xpm",
+      "gitBlob": "81afb4fd20bb250401e4ffc5a50de69b26c10c33",
+      "sha256": "5785c2d726221d0012dc30cc6f8feba54657b15d57cc38fb8e7d51ad09a70660"
+    },
+    {
+      "file": "obj5-9.xpm",
+      "sourcePath": "micropolis-activity/images/obj5-9.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj5-9.xpm",
+      "gitBlob": "8b5d8c1ab43310a856faa12c549dd02af5a155a2",
+      "sha256": "6243ebcdbd830746d158d6bf8a068db35010fa1643baebc908ed6231f7ee532a"
+    },
+    {
+      "file": "obj6-0.xpm",
+      "sourcePath": "micropolis-activity/images/obj6-0.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj6-0.xpm",
+      "gitBlob": "541101e6753d428fdfae7eabdcb2146b4c7b967d",
+      "sha256": "2af55d30962257ce612e4e70573a98000ec9d40e19ea0963a7f7bf59b6eaa72c"
+    },
+    {
+      "file": "obj6-1.xpm",
+      "sourcePath": "micropolis-activity/images/obj6-1.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj6-1.xpm",
+      "gitBlob": "27d30a44628439ee1f97af190024583d349c6201",
+      "sha256": "09fe1f966a4c6f31c2cbc06345059fa82ea7a0320426fdb57c314a7f7c1febe3"
+    },
+    {
+      "file": "obj6-2.xpm",
+      "sourcePath": "micropolis-activity/images/obj6-2.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj6-2.xpm",
+      "gitBlob": "795fe0546bfd813b10d61aa0b16449b530e1495a",
+      "sha256": "7cbba11d81ee8b2a9aa77ad44321251e90758082a07d5c82ad3372f22c02eedb"
+    },
+    {
+      "file": "obj7-0.xpm",
+      "sourcePath": "micropolis-activity/images/obj7-0.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj7-0.xpm",
+      "gitBlob": "895d2b8d72aa35d3bbf29a2862448b6a1492f50f",
+      "sha256": "d1479bab1e3bba283862122bf191617947984c3cee3125e4963f29d3ffa8f786"
+    },
+    {
+      "file": "obj7-1.xpm",
+      "sourcePath": "micropolis-activity/images/obj7-1.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj7-1.xpm",
+      "gitBlob": "ad91ed85dd951d868c11e57b0d351865e87d6c8e",
+      "sha256": "a862705bbd7d545c8933d5404a1f90b68c45cf1b9250b21b83f45c5e9fc6dee8"
+    },
+    {
+      "file": "obj7-2.xpm",
+      "sourcePath": "micropolis-activity/images/obj7-2.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj7-2.xpm",
+      "gitBlob": "4d78ab647f7acdfaa9be36525c4378e99b41ddb9",
+      "sha256": "df4b547861eebc427fdba3cc1b46193c509a26df32f2e675a5ea1b5a5f551f97"
+    },
+    {
+      "file": "obj7-3.xpm",
+      "sourcePath": "micropolis-activity/images/obj7-3.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj7-3.xpm",
+      "gitBlob": "f2a25d6694875e7122dd8411f9b4bb820e685725",
+      "sha256": "b550b221307758e3d0db524b402aa01040ffd52e5563d84e05da8aecd94d6adc"
+    },
+    {
+      "file": "obj7-4.xpm",
+      "sourcePath": "micropolis-activity/images/obj7-4.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj7-4.xpm",
+      "gitBlob": "84afc670646e592fe8cb60e3eb7b5b1097e68dce",
+      "sha256": "b67718ab39defaee85195ac27e63d8a599bcce5451e05b5c8231a68f9202014a"
+    },
+    {
+      "file": "obj7-5.xpm",
+      "sourcePath": "micropolis-activity/images/obj7-5.xpm",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/images/obj7-5.xpm",
+      "gitBlob": "2da0e872d799af45453099b3ecd6e299a112c228",
+      "sha256": "2c61d04ee638cbfcf524963b4a9d5de7f391a1f08c97e76f4358c169fd9fb052"
+    },
+    {
+      "file": "bop.wav",
+      "sourcePath": "micropolis-activity/res/sounds/bop.wav",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/res/sounds/bop.wav",
+      "gitBlob": "a2cd48c1204e98b10d8f8b390167b3ba9a1c240a",
+      "sha256": "27754d2a65d32be8726e1b8340760102a8fa57b34e5f8880da5ed1347fbc4bcf"
+    },
+    {
+      "file": "build.wav",
+      "sourcePath": "micropolis-activity/res/sounds/build.wav",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/res/sounds/build.wav",
+      "gitBlob": "b210d97c9bbdd0f3961d009fc75d8389bd89fc59",
+      "sha256": "d6a6265db971026131fb3d1f78bb0c1d0367a669618df644c5d52c1df69d95ed"
+    },
+    {
+      "file": "explosion-high.wav",
+      "sourcePath": "micropolis-activity/res/sounds/explosion-high.wav",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/res/sounds/explosion-high.wav",
+      "gitBlob": "04fdc8f868df8b435c53a849260f8200c0e1258d",
+      "sha256": "98bd8a25eaaca00563c1a441c90b26eb5607c5cbeaf09433b2807d28bdb38872"
+    },
+    {
+      "file": "explosion-low.wav",
+      "sourcePath": "micropolis-activity/res/sounds/explosion-low.wav",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/res/sounds/explosion-low.wav",
+      "gitBlob": "d9605d7550eae0f28440f91e30fac708eb8cc7ea",
+      "sha256": "9c4b1c91a7e67b17888218e586e8098d6a9e07452581a4ce5cfe2b98f7736793"
+    },
+    {
+      "file": "heavytraffic.wav",
+      "sourcePath": "micropolis-activity/res/sounds/heavytraffic.wav",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/res/sounds/heavytraffic.wav",
+      "gitBlob": "1c53cf7b2aaf19d5dd244426208b51173e4e55c0",
+      "sha256": "1f6d7b29b48ee835e6cccd39f1ba905066a046aeed4d3f29df2ff4fece10d83e"
+    },
+    {
+      "file": "honkhonk-hi.wav",
+      "sourcePath": "micropolis-activity/res/sounds/honkhonk-hi.wav",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/res/sounds/honkhonk-hi.wav",
+      "gitBlob": "9eda4968cad17da4ad0530652eafdc8290971c25",
+      "sha256": "efca05d8d43f900d65c41430909745f2d03a0b2646d9970a0eb5578137a2b247"
+    },
+    {
+      "file": "honkhonk-high.wav",
+      "sourcePath": "micropolis-activity/res/sounds/honkhonk-high.wav",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/res/sounds/honkhonk-high.wav",
+      "gitBlob": "358eb55a77799ca911023b6454cf1a5b3d4e801e",
+      "sha256": "c23e8fe3c298b8d3f1ef7fbbef625de332341502a2bbba34a8b3739edd0d5549"
+    },
+    {
+      "file": "honkhonk-low.wav",
+      "sourcePath": "micropolis-activity/res/sounds/honkhonk-low.wav",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/res/sounds/honkhonk-low.wav",
+      "gitBlob": "d406be76a929c2b3ac4a5c89c74ce2cfc90eb4e1",
+      "sha256": "8225ee2b1b687fcd95af2e475e78cd3a71fce8eff8676cf62b47de09a9d7b414"
+    },
+    {
+      "file": "honkhonk-med.wav",
+      "sourcePath": "micropolis-activity/res/sounds/honkhonk-med.wav",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/res/sounds/honkhonk-med.wav",
+      "gitBlob": "028d8e6a42b64ef919afe0d964ccea127b2b4395",
+      "sha256": "d07dc21b2a21df7f48918f0cc4d6b1dee2288dd1f00d59c28d1e749504aa7fcc"
+    },
+    {
+      "file": "monster.wav",
+      "sourcePath": "micropolis-activity/res/sounds/monster.wav",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/res/sounds/monster.wav",
+      "gitBlob": "d9b02b464e8ff723b203fcafb636b6c080fd20b4",
+      "sha256": "231efc58749199cf1c7eb7f9ef4ab07a3c3eae6f4e04d89aa261b9b593c16f94"
+    },
+    {
+      "file": "siren.wav",
+      "sourcePath": "micropolis-activity/res/sounds/siren.wav",
+      "url": "https://raw.githubusercontent.com/SimHacker/micropolis/c98f6b08519887b450d9be198bfca5237aab6d0c/micropolis-activity/res/sounds/siren.wav",
+      "gitBlob": "349ddcc522735bc9c6f91a27ec9e4de28ea32d69",
+      "sha256": "256cd8ca121f1ff68feec87d8e631835cc98334b3f47826dbbb71d346aae6078"
+    }
+  ]
+}

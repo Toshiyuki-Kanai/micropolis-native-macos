@@ -64,9 +64,14 @@ $(BUILD_DIR)/gameplay_test: $(BUILD_DIR)/gameplay_test.o $(LIBRARY)
 	$(CXX) $^ $(LDFLAGS) -o $@
 $(BUILD_DIR)/animation_test: $(ENGINE_DIR)/tests/native/animation_test.cpp $(LIBRARY)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< $(LIBRARY) $(LDFLAGS) -o $@
-test: $(BUILD_DIR)/core_test $(BUILD_DIR)/api_test $(BUILD_DIR)/gameplay_test $(BUILD_DIR)/animation_test
+$(BUILD_DIR)/parity_test.o: $(ENGINE_DIR)/tests/native/parity_test.c $(ENGINE_DIR)/native/include/micropolis_native.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+$(BUILD_DIR)/parity_test: $(BUILD_DIR)/parity_test.o $(LIBRARY)
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
+test: $(BUILD_DIR)/parity_test $(BUILD_DIR)/core_test $(BUILD_DIR)/api_test $(BUILD_DIR)/gameplay_test $(BUILD_DIR)/animation_test
 	$(BUILD_DIR)/core_test "$(REPO_DIR)" "$(BUILD_DIR)"
 	$(BUILD_DIR)/api_test "$(REPO_DIR)" "$(BUILD_DIR)"
 	$(BUILD_DIR)/gameplay_test "$(REPO_DIR)" "$(BUILD_DIR)"
 	$(BUILD_DIR)/animation_test "$(REPO_DIR)" "$(BUILD_DIR)"
+	$(BUILD_DIR)/parity_test "$(REPO_DIR)" "$(BUILD_DIR)"
 -include $(OBJECTS:.o=.d)

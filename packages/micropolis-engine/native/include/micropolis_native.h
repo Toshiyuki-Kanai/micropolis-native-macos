@@ -28,7 +28,8 @@ typedef int32_t MPResult;
 enum {
     MP_OK = 0, MP_INVALID_ARGUMENT = 1, MP_BUFFER_TOO_SMALL = 2,
     MP_OUT_OF_MEMORY = 3, MP_IO_ERROR = 4, MP_CANNOT_BUILD = 5,
-    MP_NO_FUNDS = 6, MP_NEEDS_BULLDOZE = 7, MP_INTERNAL_ERROR = 8
+    MP_NO_FUNDS = 6, MP_NEEDS_BULLDOZE = 7, MP_INTERNAL_ERROR = 8,
+    MP_BUDGET_PENDING = 9
 };
 typedef int32_t MPTool;
 enum {
@@ -51,8 +52,8 @@ enum { MP_DISASTER_FIRE = 1, MP_DISASTER_FLOOD = 2,
        MP_DISASTER_TORNADO = 3, MP_DISASTER_EARTHQUAKE = 4,
        MP_DISASTER_MONSTER = 5, MP_DISASTER_MELTDOWN = 6 };
 MPResult mp_get_details(MPGame *game, MPDetails *out_details);
-/* Automatic annual budgets; engine clamps allocations to available funds.
- * Rates take effect at the next engine budget calculation. */
+/* Configure tax and allocations without changing automatic/manual mode.
+ * Engine clamps funding at the next annual calculation. */
 MPResult mp_configure_budget(MPGame *game, int32_t tax_rate,
                              float police, float fire, float road);
 MPResult mp_set_disasters(MPGame *game, int32_t enabled);
@@ -60,6 +61,67 @@ MPResult mp_trigger_disaster(MPGame *game, int32_t disaster);
 /* One visual animation frame using the existing core table; no simulation tick.
  * No-op while paused or at speed zero. Preserves all map status flags. */
 MPResult mp_animate_tiles(MPGame *game);
+/* Additive inspection API, 2026-10-22. No borrowed storage or ABI changes.
+ * Overlay IDs: 0 population, 1 growth, 2 land, 3 crime, 4 pollution,
+ * 5 traffic, 6 power, 7 fire coverage, 8 police coverage.
+ * Values are expanded to row-major world tiles without changing their units. */
+MPResult mp_copy_overlay(MPGame *, int32_t kind, int16_t *, size_t capacity);
+/* Six types in residential/commercial/industrial/money/crime/pollution order.
+ * Scale 0=10 years, 1=120 years. 120 samples, newest first. */
+MPResult mp_copy_history(MPGame *, int32_t type, int32_t scale, int16_t *, size_t capacity);
+typedef struct MPPoint { int32_t x, y; } MPPoint;
+typedef struct MPEdit { int64_t cost; int32_t placed, rejected; MPResult status; } MPEdit;
+/* Tool-only scratch engine copies maps/funds/options/RNG, invokes core doTool.
+ * Preview never mutates the live city. Commit is atomic for the whole stroke;
+ * any insufficient-funds result leaves live maps/funds/RNG unchanged.
+ * Other invalid sites are skipped, as in ordinary tool use. Max 12000 points.
+ * Preview tiles (optional) need MP_TILE_COUNT capacity. */
+MPResult mp_edit_stroke(MPGame *, MPTool, const MPPoint *, size_t count,
+                        int32_t commit, uint16_t *preview, size_t capacity, MPEdit *);
+typedef struct MPInspection {
+    int32_t category, density, land, crime, pollution, growth, x, y;
+} MPInspection;
+MPResult mp_inspect(MPGame *, int32_t x, int32_t y, MPInspection *);
+typedef struct MPOptions {
+    int32_t difficulty, auto_bulldoze, auto_budget, budget_pending;
+    int64_t population_delta;
+    int32_t score_delta, earthquake_sequence;
+    int32_t road_effect, fire_effect, police_effect;
+    int32_t problem_ids[4], problem_votes[4];
+} MPOptions;
+MPResult mp_get_options(MPGame *, MPOptions *);
+/* Difficulty 0..2. Setting difficulty alone never resets city funds. */
+MPResult mp_set_options(MPGame *, int32_t difficulty, int32_t auto_bulldoze, int32_t auto_budget);
+MPResult mp_generate_level(MPGame *, int32_t seed, int32_t difficulty);
+/* Accept manual annual budget, then resume explicitly with mp_set_paused.
+ * mp_step stops BEFORE core settlement. No simulation accounting is replaced. */
+MPResult mp_accept_budget(MPGame *);
+typedef struct MPEvent { int32_t message, x, y, important; } MPEvent;
+/* Drain at most capacity copied events; bounded queue retains latest 128. */
+MPResult mp_poll_events(MPGame *, MPEvent *, size_t capacity, size_t *out_count);
+typedef struct MPBudgetQuote {
+    int64_t income, road_request, fire_request, police_request;
+    int64_t road_funded, fire_funded, police_funded, balance;
+} MPBudgetQuote;
+/* Execute the core annual phase on a scratch census with requested rates.
+ * An estimate at the current census, not a forecast of future city growth.
+ * Does not change live funds, map, RNG, options or histories. */
+MPResult mp_quote_budget(MPGame *, int32_t tax, float police, float fire, float road, MPBudgetQuote *);
+typedef struct MPFinance {
+    int64_t city_time, funds, tax_income, operating_expenses, capital_expenses;
+} MPFinance;
+/* Up to 120 annual records, newest first; runtime only, like MicropolisJ.
+ * Capacity query returns required size without modifying any records. */
+MPResult mp_copy_finances(MPGame *, MPFinance *, size_t capacity, size_t *out_count);
+typedef struct MPSound { int32_t kind, x, y; } MPSound;
+/* kinds: 1 build, 2 reject, 3 explosion-high, 4 explosion-low,
+ * 5 heavy traffic, 6 ship horn, 7 siren, 8 monster. Latest 32 retained. */
+MPResult mp_poll_sounds(MPGame *, MPSound *, size_t capacity, size_t *out_count);
+MPResult mp_set_sound_events(MPGame *, int32_t enabled);
+typedef struct MPSprite {
+    int32_t type, frame, x, y, width, height, x_offset, y_offset;
+} MPSprite;
+MPResult mp_copy_sprites(MPGame *, MPSprite *, size_t capacity, size_t *out_count);
 typedef struct MPSnapshot {
     int64_t city_time;
     int64_t funds;
@@ -102,6 +164,9 @@ MPResult mp_load_city(MPGame *game, const char *utf8_path);
  * This is atomic replacement, not a guarantee of power-loss durability.
  * The application must acquire sandbox/security-scoped URL access first. */
 MPResult mp_save_city(MPGame *game, const char *utf8_path);
+/* Classic 27120-byte save for MicropolisJ File loader compatibility.
+ * Rejects nonzero auxiliary tiles instead of discarding their data. */
+MPResult mp_save_city_classic(MPGame *game, const char *utf8_path);
 #ifdef __cplusplus
 }
 #endif

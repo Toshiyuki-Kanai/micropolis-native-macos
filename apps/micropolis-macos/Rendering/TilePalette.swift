@@ -63,6 +63,7 @@ enum TilePalette {
         case .stadium: .mint
         case .seaport: .indigo
         case .airport: .teal
+        case .query: .primary
         }
     }
 }

@@ -62,12 +62,30 @@ private struct CityCommands: Commands {
             Button(model?.started == true ? "停止" : "開始") { Task { await model?.startOrStop() } }.keyboardShortcut("r").disabled(model?.available != true)
             Button(model?.frame?.paused == true ? "再開" : "一時停止") { Task { await model?.togglePause() } }.keyboardShortcut(" ",modifiers:[]).disabled(model?.available != true || model?.started != true)
             Divider()
-            ForEach(1...3,id:\.self) { speed in
-                Button(["低速","中速","高速"][speed-1]) { Task { await model?.setSpeed(Int32(speed)) } }.disabled(model?.available != true)
+            ForEach(1...4,id:\.self) { speed in
+                Button(["低速","中速","高速","超高速"][speed-1]) { Task { await model?.setSpeed(Int32(speed)) } }.disabled(model?.available != true)
             }
             Divider()
             Button("予算・税率…") { model?.panel = .budget }.keyboardShortcut("b").disabled(model?.available != true)
             Button("都市評価…") { model?.panel = .evaluation }.keyboardShortcut("e").disabled(model?.available != true)
+            Button("履歴グラフ…") { model?.panel = .graphs }.keyboardShortcut("g").disabled(model?.available != true)
+            Button("都市からのお知らせ…") { model?.panel = .messages }.keyboardShortcut("m").disabled(model?.available != true)
+            Divider()
+            Menu("難易度") {
+                ForEach(0...2,id:\.self) { level in
+                    Button(["初級","中級","上級"][level]) { Task { await model?.setOptions(level:Int32(level)) } }
+                }
+            }.disabled(model?.available != true)
+            Toggle("効果音",isOn:Binding(get:{ model?.soundEnabled ?? true },set:{ model?.soundEnabled=$0 }))
+            Toggle("自動撤去",isOn:Binding(get:{ model?.frame?.civic.autoBulldoze ?? true },set:{ value in Task { await model?.setOptions(bulldoze:value) } })).disabled(model?.available != true)
+            Toggle("自動予算",isOn:Binding(get:{ model?.frame?.details.automaticBudget ?? true },set:{ value in Task { await model?.setOptions(budget:value) } })).disabled(model?.available != true)
+        }
+        CommandMenu("マップ") {
+            ForEach(CityMapLayer.allCases) { layer in Button(layer.title) { model?.mapLayer=layer } }
+            Divider()
+            Toggle("概観マップ",isOn:Binding(get:{ model?.showOverview ?? true },set:{ model?.showOverview=$0 }))
+            Button("拡大") { model?.zoomCommand += 1 }.keyboardShortcut("+")
+            Button("縮小") { model?.zoomCommand -= 1 }.keyboardShortcut("-")
         }
         CommandMenu("建設") {
             ForEach(BuildTool.allCases) { tool in

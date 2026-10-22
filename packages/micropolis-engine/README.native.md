@@ -196,3 +196,19 @@ unchanged. `mp_step` retains its existing contract; the macOS EngineSession call
 the new function once after each nonempty tick batch (normally 100 ms).
 `animation_test` checks all 1024 IDs and 32 frames against the existing core.
 No shared simulation logic, Web/WASM binding or .cty format is changed.
+
+## MicropolisJ機能向けの追加API（2026-10-22）
+
+既存ABI v1のMPSnapshot/MPDetailsと既存関数を維持し、コピー型APIを追加した。
+
+- `mp_copy_overlay`は人口・成長・地価・犯罪・汚染・交通・電力・消防・警察をworld座標のrow-major12,000値で返す。履歴は`mp_copy_history`の6種×2期間、各120値、最新が先頭。
+- `mp_inspect`は既存のqueryツール結果を返す。無料。地面を不明扱いする既存categoryの問題だけをnative境界で補正。
+- `mp_edit_stroke`は最大12,000点。仮エンジンへツールに必要なmaps/資金/autoBulldoze/animation/RNGをコピーし、既存doToolのみで料金・配置を求める。previewは実都市を変更せず、commitは全体資金不足時にmaps/資金/RNGを変更しない。無効な場所はスキップする。確定前表示と実確定の間に都市が変わった場合、確定時の都市で再計算する。
+- `mp_generate_level`と`mp_set_options`は難易度・初期資金・自動撤去・自動予算。途中難易度変更は資金をリセットしない。misc15は既存の標準難易度フィールドとしてnative境界で保存・復元する。
+- `mp_step`は自動予算OFFの決算phase直前で早く停止し、pauseする。`mp_get_options().budget_pending`を確認し、予算を設定→`mp_accept_budget`→`mp_set_paused(0)`で継続する。承認前resumeと保存は拒否する（保存の新結果`MP_BUDGET_PENDING`）。承認待ちphaseは従来.ctyで表現できないためで、既存保存先は変更しない。
+- `mp_quote_budget`は仮エンジンで現在の集計値に対する年次見積りを計算し、実資金は変えない。Javaの期間内escrow集計を再実装しない。
+- `mp_copy_finances`は直近120決算の明細。runtimeのみ。財政明細は実際の決算前後の資金差を基に記録する。C++自動予算のSpendカウンターが全要求額を入れる既存不整合は、native境界でcoreの承認済ValueとupdateFundEffectsを使って補正する。共有srcとWeb/WASMの挙動は変更しない。
+- `mp_poll_events`（128件）・`mp_poll_sounds`（32件）は有界キューをコピーしてdrainする。`mp_set_sound_events(1)`でcore音声イベントを許可。再生はフロントエンド側。`mp_copy_sprites`は7種の有効スプライトのコピーで、capacity queryに対応する。
+- `mp_save_city`は従来51120-byte拡張形式のまま。`mp_save_city_classic`は27120-byteを原子置換し、補助mapが非0なら欠落防止のため拒否する。Java v2のFile loaderは拡張形式を誤ってヘッダー付きと扱うため、SwiftUIは補助mapが空の都市にclassicを使う。
+
+詳細な基準版・差異・検証は[機能比較表](../../documentation/notes/engine/native-macos-micropolisj-parity.ja.md)を参照。

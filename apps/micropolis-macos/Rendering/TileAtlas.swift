@@ -108,3 +108,25 @@ actor TileImageRenderer {
         (cache.count,rebuilds,cache.values.reduce(0) { $0+$1.chunk.image.bytesPerRow*$1.chunk.image.height })
     }
 }
+
+/// All 57 original frames fit in a small immutable cache (about 0.45 MiB RGBA).
+struct SpriteAtlas: Sendable {
+    static let frameCounts=[1:5,2:8,3:11,4:8,5:16,6:3,7:6]
+    static let bundled=SpriteAtlas(directory:Bundle.main.resourceURL?.appendingPathComponent("OriginalGraphics/Gameplay"))
+    let images: [String:CGImage]
+    init(directory: URL?) {
+        var decoded: [String:CGImage]=[:]
+        if let directory {
+            for (kind,count) in Self.frameCounts { for frame in 0..<count {
+                let key="obj\(kind)-\(frame)"
+                let url=directory.appendingPathComponent(key+".png")
+                if let source=CGImageSourceCreateWithURL(url as CFURL,nil),
+                   let image=CGImageSourceCreateImageAtIndex(source,0,[kCGImageSourceShouldCacheImmediately:true] as CFDictionary) {
+                    decoded[key]=image
+                }
+            } }
+        }
+        images=decoded
+    }
+    func image(kind: Int32,frame: Int32) -> CGImage? { images["obj\(kind)-\(frame-1)"] }
+}

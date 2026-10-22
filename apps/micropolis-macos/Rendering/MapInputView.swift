@@ -4,6 +4,7 @@ import SwiftUI
 import AppKit
 
 struct MapInputView: NSViewRepresentable {
+    let cancel: () -> Void
     let down, drag: (CGPoint) -> Void
     let up: () -> Void
     let hover: (CGPoint?) -> Void
@@ -11,10 +12,12 @@ struct MapInputView: NSViewRepresentable {
     let zoom: (CGFloat, CGPoint) -> Void
     func makeNSView(context: Context) -> Input { Input() }
     func updateNSView(_ view: Input, context: Context) {
-        view.down=down; view.drag=drag; view.up=up; view.hover=hover; view.pan=pan; view.zoom=zoom
+        view.cancel=cancel;view.down=down; view.drag=drag; view.up=up; view.hover=hover; view.pan=pan; view.zoom=zoom
     }
     final class Input: NSView {
         var down: (CGPoint)->Void = { _ in }, drag: (CGPoint)->Void = { _ in }
+        var cancel: ()->Void = {}
+        override func cancelOperation(_ sender: Any?) { cancel();hover(nil) }
         var up: ()->Void = {}, hover: (CGPoint?)->Void = { _ in }
         var pan: (CGSize)->Void = { _ in }, zoom: (CGFloat,CGPoint)->Void = { _,_ in }
         private var area: NSTrackingArea?
@@ -28,6 +31,20 @@ struct MapInputView: NSViewRepresentable {
             addTrackingArea(next); area=next
         }
         private func point(_ e: NSEvent)->CGPoint { convert(e.locationInWindow,from:nil) }
+        override func keyDown(with e: NSEvent) {
+            if e.keyCode==53 { cancel();hover(nil);return }
+            if e.modifierFlags.intersection([.command,.control,.option]).isEmpty {
+                let distance: CGFloat=e.modifierFlags.contains(.shift) ? 120 : 40
+                switch e.keyCode {
+                case 123:pan(CGSize(width:distance,height:0));return
+                case 124:pan(CGSize(width:-distance,height:0));return
+                case 125:pan(CGSize(width:0,height:-distance));return
+                case 126:pan(CGSize(width:0,height:distance));return
+                default:break
+                }
+            }
+            super.keyDown(with:e)
+        }
         override func mouseDown(with e: NSEvent) { window?.makeFirstResponder(self); down(point(e)); hover(point(e)) }
         override func mouseDragged(with e: NSEvent) { drag(point(e)); hover(point(e)) }
         override func mouseUp(with e: NSEvent) { up() }

@@ -46,8 +46,13 @@ final class RecentCities {
         guard await model.beginDocumentAction() else { return }
         defer { model.endDocumentAction() }
         guard await ready(window) else { return }
-        guard await mayDiscard(model, window:window) else { return }
-        await model.newCity()
+        model.panel = .newCity
+    }
+    static func createSelected(_ model: CityModel, window: NSWindow?, seed: Int32, level: Int32) async {
+        guard await model.beginDocumentAction() else { return }
+        defer { model.endDocumentAction() }
+        guard await ready(window), await mayDiscard(model,window:window) else { return }
+        await model.newCity(seed:seed,level:level)
     }
     static func open(_ model: CityModel, window: NSWindow?, url: URL? = nil) async {
         if let url, focusExisting(url,excluding:model) { return }

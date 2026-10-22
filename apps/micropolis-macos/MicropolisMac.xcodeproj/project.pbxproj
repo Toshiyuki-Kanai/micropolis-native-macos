@@ -59,7 +59,7 @@
  SWIFT_VERSION = 6.0; MARKETING_VERSION = 1.0; CURRENT_PROJECT_VERSION = 1; SWIFT_OPTIMIZATION_LEVEL = "-Onone";
  GENERATE_INFOPLIST_FILE = YES; INFOPLIST_FILE = App/Info.plist; CODE_SIGN_ENTITLEMENTS = App/MicropolisMac.entitlements; INFOPLIST_KEY_CFBundleDisplayName = "Micropolis Native";
  INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.simulation-games";
- INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright (C) 1989–2007 Electronic Arts Inc. (engine). Modified version 2026-10-17, GPL-3.0-or-later with EA additional terms.";
+ INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright (C) 1989–2007 Electronic Arts Inc. (engine). Modified version 2026-10-22, GPL-3.0-or-later with EA additional terms.";
  CODE_SIGN_STYLE = Automatic; CODE_SIGN_IDENTITY = "-"; ENABLE_APP_SANDBOX = YES;
  ENABLE_HARDENED_RUNTIME = YES; COMBINE_HIDPI_IMAGES = YES;
  LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -70,7 +70,7 @@
  SWIFT_VERSION = 6.0; MARKETING_VERSION = 1.0; CURRENT_PROJECT_VERSION = 1; SWIFT_OPTIMIZATION_LEVEL = "-O";
  GENERATE_INFOPLIST_FILE = YES; INFOPLIST_FILE = App/Info.plist; CODE_SIGN_ENTITLEMENTS = App/MicropolisMac.entitlements; INFOPLIST_KEY_CFBundleDisplayName = "Micropolis Native";
  INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.simulation-games";
- INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright (C) 1989–2007 Electronic Arts Inc. (engine). Modified version 2026-10-17, GPL-3.0-or-later with EA additional terms.";
+ INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright (C) 1989–2007 Electronic Arts Inc. (engine). Modified version 2026-10-22, GPL-3.0-or-later with EA additional terms.";
  CODE_SIGN_STYLE = Automatic; CODE_SIGN_IDENTITY = "-"; ENABLE_APP_SANDBOX = YES;
  ENABLE_HARDENED_RUNTIME = YES; COMBINE_HIDPI_IMAGES = YES;
  LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";

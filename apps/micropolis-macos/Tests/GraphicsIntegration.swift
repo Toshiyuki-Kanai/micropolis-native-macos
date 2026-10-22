@@ -12,6 +12,19 @@ func require(_ condition: Bool,_ message: String) throws {
         let root=URL(fileURLWithPath:CommandLine.arguments[1],isDirectory:true)
         let output=root.appendingPathComponent("build/original-graphics")
         let resources=root.appendingPathComponent("apps/micropolis-macos/Resources/OriginalGraphics")
+        let gameplay=resources.appendingPathComponent("Gameplay")
+        let soundFiles=try FileManager.default.contentsOfDirectory(at:gameplay,includingPropertiesForKeys:nil).filter { $0.pathExtension=="wav" }
+        try require(soundFiles.count==11,"eleven verified original WAV files")
+        for url in soundFiles { try require(NSSound(contentsOf:url,byReference:false) != nil,"macOS can decode \(url.lastPathComponent)") }
+        print("PASS eleven original WAVs decode with macOS NSSound (playback remains a manual check)")
+        let sprites=SpriteAtlas(directory:resources.appendingPathComponent("Gameplay"))
+        try require(sprites.images.count==57,"all seven sprite kinds and 57 frames decode")
+        for (kind,count) in SpriteAtlas.frameCounts { for frame in 1...count {
+            let image=sprites.image(kind:Int32(kind),frame:Int32(frame))
+            try require(image != nil && image!.width==(kind<=2 ? 32 : 48),"sprite geometry matches core")
+        } }
+        try require(sprites.image(kind:8,frame:1)==nil && sprites.image(kind:1,frame:0)==nil,"unsupported/inactive sprites are not drawn")
+        print("PASS 57 original sprite frames, seven kinds, dimensions, inactive/unsupported rejection")
         let atlas=TileAtlas(url:resources.appendingPathComponent("tiles.png"))!
         let provenance=try JSONSerialization.jsonObject(with:Data(contentsOf:resources.appendingPathComponent("provenance.json"))) as! [String:Any]
         let generated=provenance["generated"] as! [String:Any]
@@ -98,6 +111,34 @@ func require(_ condition: Bool,_ message: String) throws {
             }
             try write(image,to:output.appendingPathComponent("all-tiles-\(Int(scale))x.png"))
         }
+        var moving=copy(base,tiles:[UInt16](repeating:0,count:12000))
+        var samples: [(Int,Int,[UInt8])]=[]
+        var transparentSamples: [(Int,Int)]=[]
+        var n=0
+        for (kind,count) in SpriteAtlas.frameCounts.sorted(by:{ $0.key<$1.key }) { for frame in 1...count {
+            let image=sprites.image(kind:Int32(kind),frame:Int32(frame))!
+            let x=96+(n%8)*96, y=64+(n/8)*96
+            moving.civic.sprites.append(CitySprite(kind:Int32(kind),frame:Int32(frame),x:Int32(x),y:Int32(y),width:Int32(image.width),height:Int32(image.height),offsetX:32,offsetY:-16))
+            let pixels=rgba(image)
+            if let opaque=(0..<(image.width*image.height)).first(where:{ pixels[$0*4+3]==255 }) {
+                samples.append((x+32+opaque%image.width,y-16+opaque/image.width,Array(pixels[opaque*4..<(opaque*4+4)])))
+            } else {
+                try require(stride(from:3,to:pixels.count,by:4).allSatisfy { pixels[$0]==0 },"invisible frame is fully transparent")
+                transparentSamples.append((x+32+image.width/2,y-16+image.height/2))
+            }
+            n += 1
+        } }
+        let spriteRenderer=ImageRenderer(content:TileMapCanvas(frame:moving,geometry:geometry,power:false,chunks:[],spriteAtlas:sprites,asynchronous:false).frame(width:1920,height:1600))
+        guard let spriteImage=spriteRenderer.cgImage else { throw GraphicsTestError.failed("sprite Canvas") }
+        let spritePixels=rgba(spriteImage)
+        for (x,y,pixel) in samples { for channel in 0..<3 {
+            try require(abs(Int(spritePixels[(y*spriteImage.width+x)*4+channel])-Int(pixel[channel]))<=3,"sprite frame and native offset are rendered accurately")
+        } }
+        for (x,y) in transparentSamples {
+            try require(spritePixels[(y*spriteImage.width+x)*4..<(y*spriteImage.width+x)*4+4].elementsEqual(spritePixels[0..<4]),"invisible train frame leaves city background unchanged")
+        }
+        try write(spriteImage,to:output.appendingPathComponent("all-sprites.png"))
+        print("PASS all 57 sprite frames through actual Canvas with core pixel offsets and no interpolation")
         let fallbackRenderer=ImageRenderer(content:TileMapCanvas(frame:frame,geometry:geometry,power:false,chunks:[],asynchronous:false).frame(width:1920,height:1600))
         try require(fallbackRenderer.cgImage != nil,"actual Canvas fallback rasterizes")
         for viewport in [zoomed,MapGeometry(size:CGSize(width:900,height:700),zoom:2.3,pan:CGSize(width:-123,height:99))] {

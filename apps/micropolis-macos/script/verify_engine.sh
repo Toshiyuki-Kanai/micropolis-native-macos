@@ -4,7 +4,7 @@ set -euo pipefail
 APP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REPO_ROOT="$(cd "$APP_ROOT/../.." && pwd)"
 VERIFY_DIR="$REPO_ROOT/build/macos-app-validation"
-mkdir -p "$VERIFY_DIR/module" "$REPO_ROOT/build/gameplay-validation"
+mkdir -p "$VERIFY_DIR/module" "$REPO_ROOT/build/gameplay-validation" "$REPO_ROOT/build/micropolisj-parity"
 make -C "$REPO_ROOT" -f packages/micropolis-engine/native.mk -j4 \
   CXX='xcrun clang++ -arch arm64' CC='xcrun clang -arch arm64' test
 cat > "$VERIFY_DIR/module/module.modulemap" <<MODULE

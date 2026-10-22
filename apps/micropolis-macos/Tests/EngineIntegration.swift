@@ -51,6 +51,7 @@ func expect(_ condition: Bool, _ message: String) throws {
         try geometry()
         try await modelLifecycle()
         try await filesAndStrokes()
+        try await parityFeatures()
         try transformedGeometry()
     }
 
@@ -134,7 +135,7 @@ func expect(_ condition: Bool, _ message: String) throws {
         // Native acceptance fixture starts with a funded empty city; clear map
         // comes from the engine's normal mp_create, never a frontend simulator.
         let source=root.appendingPathComponent("build/native/gameplay-grown.cty")
-        for tool in BuildTool.allCases {
+        for tool in BuildTool.allCases where tool != .query {
             let session=EngineSession()
             let initial=try await session.execute(.load(source))
             if tool == .bulldozer { _ = try await session.execute(.build(.road,x:90,y:60)) }
@@ -195,6 +196,58 @@ func expect(_ condition: Bool, _ message: String) throws {
         try expect(await second.load(haight),"Swift haight load")
         try expect(second.frame!.funds==1000000 && second.frame!.time==4839,"classic city decoded")
         print("PASS actual UI model: drag queue, file gate, save/recreate/load/continue, failed I/O protection, haight")
+    }
+
+    @MainActor static func parityFeatures() async throws {
+        let root=URL(fileURLWithPath:CommandLine.arguments[1],isDirectory:true)
+        let fixture=root.appendingPathComponent("build/native/gameplay-grown.cty")
+        let session=EngineSession()
+        let original=try await session.execute(.load(fixture))
+        for layer in CityMapLayer.allCases where (0...8).contains(layer.rawValue) {
+            try expect(try await session.overlay(layer).count==12000,"Swift overlay \(layer)")
+        }
+        for scale in 0...1 {
+            let history=try await session.histories(scale:Int32(scale))
+            try expect(history.count==6 && history.allSatisfy { $0.count==120 },"Swift history dimensions")
+        }
+        let headerFile=root.appendingPathComponent("build/micropolisj-parity/header-city.cty")
+        let raw=try Data(contentsOf:fixture)
+        let classic=Data(raw.prefix(27120))
+        var withHeader=Data(repeating:0,count:128);withHeader.append(classic)
+        try withHeader.write(to:headerFile)
+        let headerSession=EngineSession()
+        let headerCity=try await headerSession.execute(.load(headerFile))
+        try expect(headerCity.time==original.time && headerCity.funds==original.funds,"classic Mac 128-byte preamble")
+        try expect(try Data(contentsOf:headerFile)==withHeader,"opening preamble city preserves original bytes")
+        let quote=try await session.quote(tax:9,police:0.6,fire:0.7,road:0.8)
+        try expect(quote.balance==original.funds+quote.income-quote.roadFunded-quote.fireFunded-quote.policeFunded,"Swift quote copies core-funded amounts")
+        let query=try await session.inspect(MapPoint(x:90,y:60))
+        try expect(query.category==1 && query.categoryName=="空き地","Swift query uses C++ and normalized dirt category")
+        let preview=try await session.edit(.park,points:[MapPoint(x:90,y:60)],commit:false)
+        let unchanged=try await session.execute(.read)
+        try expect(original.funds==unchanged.funds && original.tiles==unchanged.tiles,"actor preview cannot change live city")
+        let committed=try await session.edit(.park,points:[MapPoint(x:90,y:60)],commit:true)
+        try expect(committed.frame!.tiles==preview.tiles && committed.frame!.funds==original.funds-preview.cost,"actor preview/commit use identical core RNG")
+        let model=CityModel();model.soundEnabled=false
+        try expect(await model.load(fixture),"model parity fixture")
+        let before=model.frame!
+        model.tool = .residential
+        model.beginStroke(MapPoint(x:90,y:60));model.extendStroke(MapPoint(x:93,y:63))
+        try await Task.sleep(for:.milliseconds(150))
+        try expect(model.previewFrame != nil && model.previewCost==400,"actual model previews four zones")
+        model.cancelStroke()
+        try expect(model.previewFrame==nil && model.frame!.funds==before.funds && !model.dirty,"Escape-equivalent cancels without charge")
+        model.beginStroke(MapPoint(x:90,y:60));model.extendStroke(MapPoint(x:93,y:63));model.endStroke()
+        try expect(await model.beginDocumentAction(),"gate drains rectangular commit")
+        try expect(model.frame!.funds==before.funds-400 && model.dirty,"four zones committed atomically")
+        model.endDocumentAction()
+        await model.setOptions(level:2,bulldoze:false,budget:false)
+        try expect(model.frame!.civic.difficulty==2 && !model.frame!.civic.autoBulldoze && !model.frame!.details.automaticBudget,"Swift options")
+        await model.setSpeed(4)
+        try expect(model.turbo && model.frame!.speed==3,"fourth native speed delegates simulation to C++")
+        let points=MapPath.rectangle(MapPoint(x:9,y:9),MapPoint(x:3,y:3),spacing:3)
+        try expect(points.count==9 && Set(points).count==9,"reverse rectangular geometry")
+        print("PASS Swift 9 overlays, 12 histories, query, immutable preview, atomic rectangular commit, cancellation, options and fourth speed")
     }
 
 }

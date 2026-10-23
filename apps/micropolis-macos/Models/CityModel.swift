@@ -25,6 +25,10 @@ final class CityModel {
     var showOverview = true
     var focusPoint: MapPoint?
     var zoomCommand: Int = 0
+    var fitCommand: UInt64 = 0
+    var mapZoom: CGFloat = 1
+    var overviewCenter: CGPoint?
+    var overviewViewport=CGRect(x:0,y:0,width:120,height:100)
     var visibleTiles=CGRect(x:0,y:0,width:120,height:100)
     private(set) var overlayValues: [Int16] = []
     private(set) var histories: [[Int16]] = []
@@ -40,7 +44,7 @@ final class CityModel {
     private var shakeTask: Task<Void,Never>?
     private(set) var shakeOffset: CGSize = .zero
     private(set) var shaking=false
-    private(set) var message = "都市を生成しています…"
+    private(set) var message = L("都市を生成しています…")
     private var lastRevision: UInt64 = 0
     private var queue: [(BuildTool, MapPoint)] = []
     private var strokeTool: BuildTool?
@@ -48,6 +52,7 @@ final class CityModel {
     private var strokeStart: MapPoint?
     private var strokePoints: [MapPoint]=[]
     private var previewTask: Task<Void,Never>?
+    private var previewEpoch: UInt64=0
     private var previewGeneration: UInt64=0
     private(set) var previewFrame: CityFrame?
     private(set) var previewCost: Int64=0
@@ -59,7 +64,7 @@ final class CityModel {
     var available: Bool { frame != nil && !busy && !documentBusy && !engineFailed }
     var acceptsMapInput: Bool { frame != nil && !documentBusy && !engineFailed }
     var running: Bool { started && frame?.paused == false && !engineFailed }
-    var title: String { fileURL?.deletingPathExtension().lastPathComponent ?? "名称未設定" }
+    var title: String { fileURL?.deletingPathExtension().lastPathComponent ?? L("名称未設定") }
 
     func run() async {
         if frame == nil { await newCity() }
@@ -73,7 +78,7 @@ final class CityModel {
                 if !Task.isCancelled {
                     apply(next); dirty = true
                     if next.civic.budgetPending {
-                        message="年次決算の予算を確認してください。"; panel = .budget
+                        message=L("年次決算の予算を確認してください。"); panel = .budget
                     }
                     if loopCount%5 == 0 { await refreshInspectionData() }
                 }
@@ -101,7 +106,7 @@ final class CityModel {
             queue.removeAll(); cancelStroke(); events=[]; inspection=nil; overlayValues=[]; histories=[]
             shakeTask?.cancel();shakeOffset = .zero;shaking=false
             started = false; engineFailed = false; dirty = false; fileURL = nil
-            message = "空き地に道路と地区、発電所・送電線を設置して開始してください。"
+            message = L("空き地に道路と地区、発電所・送電線を設置して開始してください。")
         } catch { report(error) }
     }
     @discardableResult func load(_ url: URL) async -> Bool {
@@ -112,7 +117,7 @@ final class CityModel {
             queue.removeAll(); cancelStroke(); events=[]; inspection=nil; overlayValues=[]; histories=[]
             shakeTask?.cancel();shakeOffset = .zero;shaking=false
             started = false; engineFailed = false; fileURL = url; dirty = false
-            message = "\(url.lastPathComponent)を開きました。開始で続きを進めます。"
+            message = L("%@を開きました。開始で続きを進めます。",url.lastPathComponent)
             return true
         } catch { report(error); return false }
     }
@@ -121,24 +126,42 @@ final class CityModel {
         busy = true; defer { busy = false }
         do {
             apply(try await session.execute(.save(url)))
-            fileURL = url; dirty = false; message = "\(url.lastPathComponent)を保存しました。"
+            fileURL = url; dirty = false; message = L("%@を保存しました。",url.lastPathComponent)
             return true
         } catch { report(error); return false }
     }
 
+    var canPlay: Bool { available && !running }
+    var canStop: Bool { available && started }
+    func play() async {
+        guard canPlay else { return }
+        if frame?.civic.budgetPending == true { panel = .budget; return }
+        if await perform(.paused(false)) { started=true; message=L("シミュレーション実行中") }
+    }
+    func stop() async {
+        guard canStop else { return }
+        if await perform(.paused(true)) { started=false; message=L("停止中 — 都市は保持されています。") }
+    }
+    func refreshLanguage() {
+        cancelStroke()
+        if frame?.civic.budgetPending == true { message=L("年次決算の予算を確認してください。") }
+        else if running { message=L("シミュレーション実行中") }
+        else if started { message=L("一時停止中") }
+        else { message=L("停止中 — 都市は保持されています。") }
+    }
     func startOrStop() async {
         guard available else { return }
         if frame?.civic.budgetPending == true { panel = .budget; return }
         if await perform(.paused(started)) {
             started.toggle()
-            message = started ? "シミュレーション実行中" : "停止中 — 都市は保持されています。"
+            message = started ? L("シミュレーション実行中") : L("停止中 — 都市は保持されています。")
         }
     }
     func togglePause() async {
         guard available, started, let frame else { return }
         if frame.civic.budgetPending { panel = .budget; return }
         if await perform(.paused(!frame.paused)) {
-            message = self.frame?.paused == true ? "一時停止中" : "再開しました。"
+            message = self.frame?.paused == true ? L("一時停止中") : L("再開しました。")
         }
     }
     func setSpeed(_ speed: Int32) async {
@@ -187,28 +210,38 @@ final class CityModel {
         cancelStroke()
     }
     func cancelStroke() {
-        previewTask?.cancel();previewTask=nil;previewGeneration += 1
+        previewTask?.cancel();previewTask=nil;previewEpoch += 1;previewGeneration += 1
         strokeTool=nil;strokeStart=nil;strokeLast=nil;strokePoints=[];visited=[];previewFrame=nil;previewCost=0;previewStatus=0
     }
     private func updatePreview() {
-        previewTask?.cancel();previewGeneration += 1
-        let generation=previewGeneration, points=strokePoints
-        guard let selected=strokeTool, var base=frame else { return }
+        previewGeneration += 1
+        // Coalesce pointer input while one actor request is running. Never
+        // postpone all previews until the pointer stops moving.
+        guard previewTask == nil else { return }
+        let epoch=previewEpoch
         previewTask=Task {
-            do {
-                // Debounce pointer events; all work and allocations stay on actor.
-                try await Task.sleep(for:.milliseconds(35))
-                let result=try await session.edit(selected,points:points,commit:false)
-                guard !Task.isCancelled, generation==previewGeneration else { return }
-                base.tiles=result.tiles;base.revision=UInt64.max/2+generation
-                previewFrame=base;previewCost=result.cost;previewStatus=result.status
-            } catch { if !Task.isCancelled { report(error) } }
+            while !Task.isCancelled, epoch==previewEpoch {
+                let generation=previewGeneration, points=strokePoints
+                guard let selected=strokeTool, var base=frame else { break }
+                do {
+                    let result=try await session.edit(selected,points:points,commit:false)
+                    guard !Task.isCancelled, epoch==previewEpoch else { return }
+                    base.tiles=result.tiles;base.revision=UInt64.max/2+generation
+                    previewFrame=base;previewCost=result.cost;previewStatus=result.status
+                    if generation==previewGeneration { break }
+                    try await Task.sleep(for:.milliseconds(16))
+                } catch {
+                    if !Task.isCancelled, epoch==previewEpoch { report(error) }
+                    break
+                }
+            }
+            if epoch==previewEpoch { previewTask=nil }
         }
     }
     private func enqueue(_ points: [MapPoint]) {
         guard let selected=strokeTool else { return }
         for p in points where (0..<120).contains(p.x) && (0..<100).contains(p.y) {
-            if queue.count>=12000 { message="建設入力が多すぎます。処理後に再試行してください。"; break }
+            if queue.count>=12000 { message=L("建設入力が多すぎます。処理後に再試行してください。"); break }
             queue.append((selected,p))
         }
         guard !draining else { return }
@@ -227,11 +260,11 @@ final class CityModel {
             do {
                 let result = try await session.edit(selected, points:batch.map { $0.1 },commit:true)
                 if let frame=result.frame { apply(frame) }
-                guard result.status != MP_NO_FUNDS else { message="ストローク全体の資金が不足しています。建設を取り消しました。";busy=false;continue }
+                guard result.status != MP_NO_FUNDS else { message=L("ストローク全体の資金が不足しています。建設を取り消しました。");busy=false;continue }
                 placed += result.placed; rejected += result.rejected
                 if result.placed > 0 { dirty = true; if selected != .bulldozer { playSound(1) } }
                 else if result.rejected>0 { playSound(2) }
-                message = "\(selected.title): \(placed)箇所配置\(rejected > 0 ? "、\(rejected)箇所は配置不可" : "")"
+                message = L("%@: %@箇所配置%@",selected.title,placed,rejected > 0 ? L("、%@箇所は配置不可",rejected) : "")
                 if placed == 0 { message = EngineFailure(code:result.status).description }
             } catch { report(error); queue.removeAll() }
             busy = false

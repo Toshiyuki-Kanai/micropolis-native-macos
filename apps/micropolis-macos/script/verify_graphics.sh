@@ -10,9 +10,9 @@ python3 "$APP_ROOT/script/prepare_gameplay_assets.py" --check
 "$APP_ROOT/script/verify_engine.sh"
 xcrun swiftc -parse-as-library -swift-version 6 -target arm64-apple-macosx27.0 \
   -module-cache-path "$VERIFY_DIR/module-cache" -I "$VERIFY_DIR/module" \
-  "$APP_ROOT/Models/CityFrame.swift" "$APP_ROOT/Services/EngineSession.swift" \
+  "$APP_ROOT/Models/AppText.swift" "$APP_ROOT/Models/CityFrame.swift" "$APP_ROOT/Services/EngineSession.swift" \
   "$APP_ROOT/Rendering/MapGeometry.swift" "$APP_ROOT/Rendering/TilePalette.swift" \
   "$APP_ROOT/Rendering/TileAtlas.swift" "$APP_ROOT/Rendering/TerrainCanvas.swift" \
-  "$APP_ROOT/Tests/GraphicsIntegration.swift" \
+  "$APP_ROOT/Views/CityStatusBar.swift" "$APP_ROOT/Tests/GraphicsIntegration.swift" \
   "$REPO_ROOT/build/native/libmicropolis_native.a" -lc++ -o "$VERIFY_DIR/GraphicsIntegration"
 "$VERIFY_DIR/GraphicsIntegration" "$REPO_ROOT"

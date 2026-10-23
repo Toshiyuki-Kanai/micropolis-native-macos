@@ -24,7 +24,7 @@ cat > "$PROBE/Contents/Info.plist" <<PLIST
 PLIST
 xcrun swiftc -parse-as-library -swift-version 6 -target arm64-apple-macosx27.0 \
   -module-cache-path "$VERIFY_DIR/module-cache" -I "$VERIFY_DIR/module" \
-  "$APP_ROOT/Models/CityFrame.swift" "$APP_ROOT/Services/EngineSession.swift" \
+  "$APP_ROOT/Models/AppText.swift" "$APP_ROOT/Models/CityFrame.swift" "$APP_ROOT/Services/EngineSession.swift" \
   "$APP_ROOT/Tests/SandboxSaveProbe.swift" \
   "$REPO_ROOT/build/native/libmicropolis_native.a" -lc++ \
   -o "$PROBE/Contents/MacOS/SaveSandboxProbe"

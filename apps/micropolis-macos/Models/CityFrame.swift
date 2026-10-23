@@ -49,22 +49,22 @@ enum BuildTool: Int32, CaseIterable, Identifiable, Sendable {
     var id: Int32 { rawValue }
     var title: String {
         switch self {
-        case .road: "道路"
-        case .residential: "住宅地区"
-        case .commercial: "商業地区"
-        case .industrial: "工業地区"
-        case .bulldozer: "撤去"
-        case .wire: "送電線"
-        case .railroad: "鉄道"
-        case .park: "公園"
-        case .coal: "石炭発電所"
-        case .nuclear: "原子力発電所"
-        case .police: "警察署"
-        case .fire: "消防署"
-        case .stadium: "スタジアム"
-        case .seaport: "港"
-        case .airport: "空港"
-        case .query: "区域調査"
+        case .road: L("道路")
+        case .residential: L("住宅地区")
+        case .commercial: L("商業地区")
+        case .industrial: L("工業地区")
+        case .bulldozer: L("撤去")
+        case .wire: L("送電線")
+        case .railroad: L("鉄道")
+        case .park: L("公園")
+        case .coal: L("石炭発電所")
+        case .nuclear: L("原子力発電所")
+        case .police: L("警察署")
+        case .fire: L("消防署")
+        case .stadium: L("スタジアム")
+        case .seaport: L("港")
+        case .airport: L("空港")
+        case .query: L("区域調査")
         }
     }
     var symbol: String {
@@ -116,7 +116,7 @@ enum CityPanel: String, Identifiable { case budget, evaluation, guide, graphs, m
 enum Disaster: Int32, CaseIterable, Identifiable {
     case fire=1, flood, tornado, earthquake, monster, meltdown
     var id: Int32 { rawValue }
-    var title: String { ["火災", "洪水", "竜巻", "地震", "怪獣", "メルトダウン"][Int(rawValue)-1] }
+    var title: String { [L("火災"), L("洪水"), L("竜巻"), L("地震"), L("怪獣"), L("メルトダウン")][Int(rawValue)-1] }
 }
 
 // Copied civic data; no engine pointers escape the session actor.
@@ -126,20 +126,20 @@ enum CityMapLayer: Int32, CaseIterable, Identifiable, Sendable {
     var id: Int32 { rawValue }
     var title: String {
         switch self {
-        case .all: "全区域"
-        case .population: "人口密度"
-        case .growth: "成長率"
-        case .land: "地価"
-        case .crime: "犯罪"
-        case .pollution: "汚染"
-        case .traffic: "交通量"
-        case .power: "電力"
-        case .fire: "消防管轄"
-        case .police: "警察管轄"
-        case .residential: "住宅"
-        case .commercial: "商業"
-        case .industrial: "工業"
-        case .transport: "交通網"
+        case .all: L("全区域")
+        case .population: L("人口密度")
+        case .growth: L("成長率")
+        case .land: L("地価")
+        case .crime: L("犯罪")
+        case .pollution: L("汚染")
+        case .traffic: L("交通量")
+        case .power: L("電力")
+        case .fire: L("消防管轄")
+        case .police: L("警察管轄")
+        case .residential: L("住宅")
+        case .commercial: L("商業")
+        case .industrial: L("工業")
+        case .transport: L("交通網")
         }
     }
 }
@@ -168,7 +168,7 @@ struct CitySprite: Sendable {
 struct ZoneInspection: Sendable {
     let category, density, land, crime, pollution, growth, x, y: Int32
     var categoryName: String {
-        let names=["空き地","水域","森林","瓦礫","洪水","放射能","火災","道路","送電線","鉄道","住宅","商業","工業","港","空港","石炭発電所","消防署","警察署","スタジアム","原子力発電所","跳ね橋","レーダー","噴水","工業","競技場","跳ね橋","特殊施設","不明","不明"]
+        let names=[L("空き地"),L("水域"),L("森林"),L("瓦礫"),L("洪水"),L("放射能"),L("火災"),L("道路"),L("送電線"),L("鉄道"),L("住宅"),L("商業"),L("工業"),L("港"),L("空港"),L("石炭発電所"),L("消防署"),L("警察署"),L("スタジアム"),L("原子力発電所"),L("跳ね橋"),L("レーダー"),L("噴水"),L("工業"),L("競技場"),L("跳ね橋"),L("特殊施設"),L("不明"),L("不明")]
         return names[max(0,min(names.count-1,Int(category)-1))]
     }
 }
@@ -176,21 +176,21 @@ struct ZoneInspection: Sendable {
 enum CityMessages {
     static func text(_ id: Int32) -> String {
         let messages: [Int32:String]=[
-            1:"住宅地区が必要です。",2:"商業地区が必要です。",3:"工業地区が必要です。",
-            4:"道路が必要です。",5:"鉄道が必要です。",6:"電力が必要です。",
-            7:"スタジアムが必要です。",8:"港が必要です。",9:"空港が必要です。",
-            10:"汚染が深刻です。",11:"犯罪が深刻です。",12:"交通渋滞が発生しています。",
-            13:"消防署が必要です。",14:"警察署が必要です。",15:"停電が報告されています。",
-            16:"税率が高すぎます。",17:"道路予算が不足しています。",18:"消防予算が不足しています。",
-            19:"警察予算が不足しています。",20:"火災が発生しました。",21:"怪獣が現れました。",
-            22:"竜巻が発生しました。",23:"地震が発生しました。",24:"航空機が墜落しました。",
-            25:"船舶事故が発生しました。",26:"列車事故が発生しました。",27:"ヘリコプター事故が発生しました。",
-            28:"失業率が高くなっています。",29:"資金がありません。",30:"爆撃による火災が報告されています。",
-            31:"公園が必要です。",32:"爆発が報告されています。",
-            33:"建設資金が不足しています。",34:"先に撤去してください。",35:"人口が2,000人に到達しました。",36:"人口が10,000人に到達しました。",
-            37:"人口が50,000人に到達しました。",38:"人口が100,000人に到達しました。",39:"人口が500,000人に到達しました。",40:"発電能力が不足しています。",41:"激しい交通渋滞が報告されています。",42:"洪水が発生しました。",43:"原子力発電所でメルトダウンが発生しました。",44:"暴動が発生しました。",45:"新しい都市を作成しました。",46:"都市を読み込みました。"
+            1:L("住宅地区が必要です。"),2:L("商業地区が必要です。"),3:L("工業地区が必要です。"),
+            4:L("道路が必要です。"),5:L("鉄道が必要です。"),6:L("電力が必要です。"),
+            7:L("スタジアムが必要です。"),8:L("港が必要です。"),9:L("空港が必要です。"),
+            10:L("汚染が深刻です。"),11:L("犯罪が深刻です。"),12:L("交通渋滞が発生しています。"),
+            13:L("消防署が必要です。"),14:L("警察署が必要です。"),15:L("停電が報告されています。"),
+            16:L("税率が高すぎます。"),17:L("道路予算が不足しています。"),18:L("消防予算が不足しています。"),
+            19:L("警察予算が不足しています。"),20:L("火災が発生しました。"),21:L("怪獣が現れました。"),
+            22:L("竜巻が発生しました。"),23:L("地震が発生しました。"),24:L("航空機が墜落しました。"),
+            25:L("船舶事故が発生しました。"),26:L("列車事故が発生しました。"),27:L("ヘリコプター事故が発生しました。"),
+            28:L("失業率が高くなっています。"),29:L("資金がありません。"),30:L("爆撃による火災が報告されています。"),
+            31:L("公園が必要です。"),32:L("爆発が報告されています。"),
+            33:L("建設資金が不足しています。"),34:L("先に撤去してください。"),35:L("人口が2,000人に到達しました。"),36:L("人口が10,000人に到達しました。"),
+            37:L("人口が50,000人に到達しました。"),38:L("人口が100,000人に到達しました。"),39:L("人口が500,000人に到達しました。"),40:L("発電能力が不足しています。"),41:L("激しい交通渋滞が報告されています。"),42:L("洪水が発生しました。"),43:L("原子力発電所でメルトダウンが発生しました。"),44:L("暴動が発生しました。"),45:L("新しい都市を作成しました。"),46:L("都市を読み込みました。")
         ]
-        return messages[id] ?? "都市からのお知らせ（エンジン通知 \(id)）"
+        return messages[id] ?? L("都市からのお知らせ（エンジン通知 %@）",id)
     }
 }
 

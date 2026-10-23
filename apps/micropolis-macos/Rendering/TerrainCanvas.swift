@@ -14,7 +14,7 @@ struct TerrainCanvas: View {
             }
             .overlay(alignment:.bottomLeading) {
                 if TileAtlas.bundled == nil {
-                    Text("タイル画像を読み込めないため簡易表示中")
+                    Text(L("タイル画像を読み込めないため簡易表示中"))
                         .font(.caption).padding(6).background(.regularMaterial).padding(8)
                 }
             }
@@ -27,6 +27,7 @@ struct TileMapCanvas: View {
     let geometry: MapGeometry
     let power: Bool
     let chunks: [TileChunk]
+    var tileAtlas=TileAtlas.bundled
     var spriteAtlas=SpriteAtlas.bundled
     var asynchronous=true
     var body: some View {
@@ -45,10 +46,21 @@ struct TileMapCanvas: View {
                 let rect=CGRect(origin:origin,size:CGSize(width:CGFloat(chunk.width)*g.tileSize,height:CGFloat(chunk.height)*g.tileSize))
                 context.draw(Image(decorative:chunk.image,scale:1,orientation:.up).interpolation(.none),in:rect)
             }
-            let drawn=Set(chunks.map { ($0.y/16)*8+$0.x/16 })
+            let cached=Dictionary(uniqueKeysWithValues:chunks.map { (($0.y/16)*8+$0.x/16,$0) })
             for y in g.rows { for x in g.columns {
                 let raw=frame.tiles[y*120+x], id=raw & TileAtlas.idMask, r=g.tileRect(x:x,y:y)
-                let illustrated=TileAtlas.imageIndex(for:raw) != nil && drawn.contains((y/16)*8+x/16)
+                let chunk=cached[(y/16)*8+x/16]
+                let unchanged=chunk.map { $0.ids[(y-$0.y)*$0.width+x-$0.x] == id } ?? false
+                var illustrated=TileAtlas.imageIndex(for:raw) != nil && unchanged
+                if !unchanged {
+                    if let tile=tileAtlas?.tileImage(for:raw) {
+                        context.draw(Image(decorative:tile,scale:1,orientation:.up).interpolation(.none),in:r)
+                        illustrated=true
+                    } else {
+                        // Clear an old chunk's pixels for unsupported/missing art.
+                        context.fill(Path(r),with:.color(TilePalette.color(id)),style:FillStyle(antialiased:false))
+                    }
+                }
                 if power, raw & 0x4000 != 0 {
                     if raw & 0x0400 != 0 {
                         context.fill(Path(r),with:.color(raw & 0x8000 != 0 ? .yellow.opacity(0.5) : .red.opacity(0.5)))

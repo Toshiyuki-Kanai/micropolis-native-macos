@@ -52,6 +52,7 @@ func expect(_ condition: Bool, _ message: String) throws {
         try await modelLifecycle()
         try await filesAndStrokes()
         try await parityFeatures()
+        try await interfaceRefinements()
         try transformedGeometry()
     }
 
@@ -125,6 +126,25 @@ func expect(_ condition: Bool, _ message: String) throws {
         for i in 1..<path.count {
             try expect(abs(path[i].x-path[i-1].x)+abs(path[i].y-path[i-1].y)==1,"four-connected stroke")
         }
+        let mini=MapGeometry(size:CGSize(width:240,height:150)) // Includes letterbox margins.
+        let visibleRect=CGRect(x:35,y:30,width:40,height:30)
+        let start=CGPoint(x:mini.rect.minX+40*mini.tileSize,y:mini.rect.minY+35*mini.tileSize)
+        var drag=OverviewDrag()
+        let first=drag.center(start:start,current:start,geometry:mini,viewport:visibleRect)!
+        try expect(first==CGPoint(x:55,y:45),"grabbing overview frame does not jump its center")
+        let moved=drag.center(start:start,current:CGPoint(x:start.x+15*mini.tileSize,y:start.y+10*mini.tileSize),geometry:mini,viewport:visibleRect.offsetBy(dx:2,dy:1))!
+        try expect(moved==CGPoint(x:70,y:55),"overview drag retains grab offset as viewport updates")
+        var linked=MapViewport(zoom:2.85)
+        linked.center(at:moved,size:size)
+        let linkedGeometry=MapGeometry(size:size,zoom:linked.zoom,pan:linked.pan)
+        try expect(abs((size.width/2-linkedGeometry.rect.minX)/linkedGeometry.tileSize-70)<0.001,"overview moves main map center")
+        try expect(linked.zoom==2.85,"overview drag preserves zoom")
+        linked.center(at:CGPoint(x:120,y:100),size:size)
+        try expect(linked.pan.width.isFinite && linked.pan.height.isFinite,"overview boundaries clamp")
+        drag.end()
+        let clicked=drag.center(start:CGPoint(x:mini.rect.minX+90*mini.tileSize,y:mini.rect.minY+80*mini.tileSize),current:CGPoint(x:mini.rect.minX+90*mini.tileSize,y:mini.rect.minY+80*mini.tileSize),geometry:mini,viewport:visibleRect)!
+        try expect(clicked==CGPoint(x:90,y:80),"overview background click centers directly")
+        print("PASS overview frame grab offset, continuous drag, zoom preservation and main-map linkage")
         print("PASS pan/zoom/resize coordinate transforms and four-connected drag path")
     }
 
@@ -248,6 +268,48 @@ func expect(_ condition: Bool, _ message: String) throws {
         let points=MapPath.rectangle(MapPoint(x:9,y:9),MapPoint(x:3,y:3),spacing:3)
         try expect(points.count==9 && Set(points).count==9,"reverse rectangular geometry")
         print("PASS Swift 9 overlays, 12 histories, query, immutable preview, atomic rectangular commit, cancellation, options and fourth speed")
+    }
+
+    @MainActor static func interfaceRefinements() async throws {
+        let root=URL(fileURLWithPath:CommandLine.arguments[1],isDirectory:true)
+        let table=try JSONDecoder().decode([String:String].self,from:Data(contentsOf:root.appendingPathComponent("apps/micropolis-macos/Resources/Localization/English.json")))
+        try expect(!table.isEmpty,"application translation resource loads")
+        for (key,value) in table {
+            try expect(key.components(separatedBy:"%@").count==value.components(separatedBy:"%@").count,"translation placeholders match")
+        }
+        try expect(AppText.format("道路",language:"en",table:table,arguments:[])=="Road","English tool")
+        try expect(AppText.format("道路",language:"ja",table:table,arguments:[])=="道路","Japanese tool")
+        try expect(AppText.format("税率 %@%%",language:"en",table:table,arguments:["9"])=="Tax Rate 9%","localized percent")
+        let model=CityModel();model.soundEnabled=false
+        try expect(await model.load(root.appendingPathComponent("build/native/gameplay-grown.cty")),"UI fixture")
+        try expect(model.canPlay && !model.canStop,"stopped transport buttons")
+        await model.play()
+        try expect(!model.canPlay && model.canStop && model.running,"running transport buttons")
+        await model.play()
+        try expect(model.running,"disabled play never stops simulation")
+        await model.togglePause()
+        try expect(model.canPlay && model.canStop && !model.running,"paused transport buttons")
+        await model.play()
+        try expect(model.running,"play resumes pause")
+        await model.stop()
+        try expect(model.canPlay && !model.canStop && !model.started,"stop enables only play")
+        for tool in [BuildTool.road,.wire] {
+            model.tool=tool
+            let funds=model.frame!.funds
+            model.beginStroke(MapPoint(x:90,y:60))
+            var intermediate=false
+            for n in 1...40 {
+                model.extendStroke(MapPoint(x:90+Int32(n%24),y:60))
+                try await Task.sleep(for:.milliseconds(5))
+                if model.previewFrame != nil && model.previewCost>0 { intermediate=true }
+            }
+            try expect(intermediate,"road/wire preview visible DURING continuous pointer movement")
+            try expect(model.frame!.funds==funds && !model.dirty,"live preview cannot charge or edit city")
+            model.cancelStroke()
+            try await Task.sleep(for:.milliseconds(50))
+            try expect(model.previewFrame==nil && model.previewCost==0,"canceled actor preview cannot reappear")
+        }
+        print("PASS Japanese/English formatting, play/stop states, road/wire live continuous preview and cancellation")
     }
 
 }

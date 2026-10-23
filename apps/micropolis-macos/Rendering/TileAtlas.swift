@@ -19,6 +19,11 @@ struct TileAtlas: Sendable {
         return TileAtlas(url:url)
     }()
     let rgba: [UInt8]
+    let images: [CGImage]
+    func tileImage(for raw: UInt16) -> CGImage? {
+        guard let id=Self.imageIndex(for:raw) else { return nil }
+        return images[id]
+    }
 
     init?(url: URL) {
         guard let source=CGImageSourceCreateWithURL(url as CFURL,nil),
@@ -35,6 +40,17 @@ struct TileAtlas: Sendable {
         }
         guard decoded else { return nil }
         rgba=bytes
+        guard let provider=CGDataProvider(data:Data(bytes) as CFData),
+              let sheet=CGImage(width:16,height:16*Self.tileCount,bitsPerComponent:8,bitsPerPixel:32,
+                                bytesPerRow:64,space:CGColorSpaceCreateDeviceRGB(),
+                                bitmapInfo:CGBitmapInfo(rawValue:CGImageAlphaInfo.premultipliedLast.rawValue),
+                                provider:provider,decode:nil,shouldInterpolate:false,intent:.defaultIntent) else { return nil }
+        var tiles: [CGImage]=[]
+        for id in 0..<956 {
+            guard let tile=sheet.cropping(to:CGRect(x:0,y:id*16,width:16,height:16)) else { return nil }
+            tiles.append(tile)
+        }
+        images=tiles
     }
 }
 
@@ -50,6 +66,13 @@ struct TileRenderKey: Hashable {
 struct TileChunk: Sendable {
     let x, y, width, height: Int // Map tiles, independent of screen/Retina scale.
     let image: CGImage
+    let ids: [UInt16]
+    func matches(_ tiles: [UInt16]) -> Bool {
+        for row in 0..<height { for column in 0..<width {
+            if tiles[(y+row)*120+x+column] & TileAtlas.idMask != ids[row*width+column] { return false }
+        } }
+        return true
+    }
 }
 
 /// Only visible chunks are assembled. Immutable images cross the actor boundary;
@@ -97,7 +120,7 @@ actor TileImageRenderer {
                                         bytesPerRow:pixelWidth*4,space:CGColorSpaceCreateDeviceRGB(),
                                         bitmapInfo:CGBitmapInfo(rawValue:CGImageAlphaInfo.premultipliedLast.rawValue),
                                         provider:provider,decode:nil,shouldInterpolate:false,intent:.defaultIntent) else { continue }
-                let chunk=TileChunk(x:x,y:y,width:width,height:height,image:image)
+                let chunk=TileChunk(x:x,y:y,width:width,height:height,image:image,ids:ids)
                 cache[key]=CachedChunk(ids:ids,chunk:chunk)
                 rebuilds += 1; result.append(chunk)
             }

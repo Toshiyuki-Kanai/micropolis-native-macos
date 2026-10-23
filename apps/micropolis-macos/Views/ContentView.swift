@@ -3,66 +3,94 @@ import SwiftUI
 
 struct ContentView: View {
     @Bindable var model: CityModel
+    @AppStorage("appAppearance") private var appearance="system"
+    @AppStorage("appLanguage") private var language="system"
+    @State private var columns: NavigationSplitViewVisibility = .all
     private var window: NSWindow? { CityWindows.shared.window(for:model) }
     var body: some View {
-        VStack(spacing:0) {
-            if let f=model.frame {
-                HStack(spacing:20) {
-                    Text("資金 \(f.funds.formatted())")
-                    Text(f.populationPending ? "人口 集計待ち" : "人口 \(f.population.formatted())")
-                    Text("\(String(f.year))年\(f.month+1)月")
-                    DemandBars(details:f.details)
-                    Text("通電 \(f.details.powered) / 未通電 \(f.details.unpowered)").foregroundStyle(.secondary)
-                    Spacer()
-                    Text(model.started ? (f.paused ? "一時停止" : "実行中") : "停止中").foregroundStyle(.secondary)
-                }.monospacedDigit().padding(12)
+        NavigationSplitView(columnVisibility:$columns) {
+            CitySidebar(model:model)
+                .navigationSplitViewColumnWidth(min:210,ideal:260,max:2000)
+                .navigationTitle("")
+        } detail: {
+            VStack(spacing:0) {
+                if model.frame != nil {
+                    CityMapView(model:model).frame(maxWidth:.infinity,maxHeight:.infinity)
+                } else {
+                    ProgressView(L("都市を生成しています…")).frame(maxWidth:.infinity,maxHeight:.infinity)
+                }
+                if let frame=model.frame {
+                    Divider()
+                    CityStatusBar(frame:frame)
+                }
                 Divider()
-                CityMapView(model:model)
-            } else {
-                ProgressView("都市を生成しています…").frame(maxWidth:.infinity,maxHeight:.infinity)
+                HStack(spacing:12) {
+                    Circle().fill(TilePalette.color(for:model.tool)).frame(width:10,height:10)
+                    Text(L("%@ · 基本費用 %@",model.tool.title,model.tool.baseCost)).fontWeight(.medium).lineLimit(1)
+                    Text(model.message).lineLimit(1).help(model.message).foregroundStyle(.secondary).layoutPriority(-1)
+                    Spacer(minLength:0)
+                    Text(model.started ? (model.frame?.paused == true ? L("一時停止") : L("実行中")) : L("停止中"))
+                        .foregroundStyle(.secondary).fixedSize().layoutPriority(1)
+                    if model.dirty { Text(L("未保存")).foregroundStyle(.secondary).fixedSize().layoutPriority(1) }
+                }.font(.system(size:14)).padding(12)
             }
-            Divider()
-            HStack(spacing:12) {
-                Circle().fill(TilePalette.color(for:model.tool)).frame(width:10,height:10)
-                Text("\(model.tool.title) · 基本費用 \(model.tool.baseCost)").fontWeight(.medium)
-                Text(model.message).lineLimit(1).foregroundStyle(.secondary)
-                Spacer()
-                if model.dirty { Text("未保存").foregroundStyle(.secondary) }
-            }.font(.caption).padding(10)
+            .frame(minWidth:320)
+            .navigationTitle(model.title)
         }
-        .frame(minWidth:900,minHeight:600)
-        .navigationTitle(model.title)
+        .navigationSplitViewStyle(.balanced)
+        .id(language)
+        .preferredColorScheme(appearance == "system" ? nil : appearance == "dark" ? .dark : .light)
+        .environment(\.locale,Locale(identifier:AppText.language))
+        .onChange(of:language) { _,_ in model.refreshLanguage() }
+        .frame(minWidth:950,minHeight:650)
         .background(CityWindowBridge(model:model).frame(width:0,height:0))
         .toolbar {
             ToolbarItemGroup(placement:.navigation) {
-                Button { Task { await CityFiles.newCity(model,window:window) } } label: { Label("新規都市",systemImage:"plus") }.disabled(model.documentBusy)
-                Picker("建設ツール",selection:$model.tool) {
-                    ForEach(BuildTool.allCases) { t in Label(t.title,systemImage:t.symbol).tag(t) }
-                }.labelStyle(.titleAndIcon).frame(width:185).disabled(!model.acceptsMapInput)
+                Button { Task { await CityFiles.newCity(model,window:window) } } label: { Label(L("新規都市"),systemImage:"plus") }.disabled(model.documentBusy)
+                Button { Task { await CityFiles.open(model,window:window) } } label: { Label(L("都市を開く…"),systemImage:"folder") }.disabled(model.documentBusy)
+                Button { Task { _ = await CityFiles.save(model,window:window) } } label: { Label(L("保存"),systemImage:"square.and.arrow.down") }.disabled(!model.available)
             }
             ToolbarItemGroup(placement:.primaryAction) {
-                Button { Task { await model.startOrStop() } } label: { Label(model.started ? "停止" : "開始",systemImage:model.started ? "stop.fill" : "play.fill") }.help(model.started ? "停止" : "開始").disabled(!model.available)
-                Button { Task { await model.togglePause() } } label: { Label(model.frame?.paused == true ? "再開" : "一時停止",systemImage:model.frame?.paused == true ? "play.fill" : "pause.fill") }.help("一時停止・再開").disabled(!model.available || !model.started)
-                Picker("速度",selection:Binding(get:{ model.turbo ? 4 : (model.frame?.speed ?? 3) },set:{ value in Task { await model.setSpeed(value) } })) {
-                    Text("低速").tag(Int32(1)); Text("中速").tag(Int32(2)); Text("高速").tag(Int32(3)); Text("超高速").tag(Int32(4))
+                Button { Task { await model.play() } } label: {
+                    Label(L("再生"),systemImage:"play.fill")
+                }.help(L("開始・再開")).disabled(!model.canPlay)
+                Button { Task { await model.stop() } } label: {
+                    Label(L("停止"),systemImage:"stop.fill")
+                }.help(L("停止")).disabled(!model.canStop)
+                Picker(L("速度"),selection:Binding(get:{ model.turbo ? 4 : (model.frame?.speed ?? 3) },set:{ value in Task { await model.setSpeed(value) } })) {
+                    Text(L("低速")).tag(Int32(1)); Text(L("中速")).tag(Int32(2)); Text(L("高速")).tag(Int32(3)); Text(L("超高速")).tag(Int32(4))
                 }.frame(width:95).disabled(!model.available)
-                Toggle(isOn:$model.powerOverlay) { Label("電力表示",systemImage:"bolt") }.help("区域中心: 黄=通電、赤=未通電。導電タイルには黄色の枠。")
                 Menu {
-                    Button("予算・税率…") { model.panel = .budget }
-                    Button("都市評価…") { model.panel = .evaluation }
-                    Button("履歴グラフ…") { model.panel = .graphs }
-                    Button("都市からのお知らせ…") { model.panel = .messages }
-                    Button("遊び方…") { model.panel = .guide }
-                } label: { Label("都市情報",systemImage:"info.circle") }
+                    Button(L("拡大")) { model.zoomCommand += 1 }
+                    Button(L("縮小")) { model.zoomCommand -= 1 }
+                    Button(L("全体")) { model.fitCommand += 1 }
+                } label: { Text("\(Int(model.mapZoom*100))%") }
+                Menu {
+                    ForEach(CityMapLayer.allCases) { layer in
+                        Button { model.mapLayer=layer } label: {
+                            if model.mapLayer == layer { Label(layer.title,systemImage:"checkmark") }
+                            else { Text(layer.title) }
+                        }
+                    }
+                } label: { Label(L("マップ表示"),systemImage:"map") }
+                    .help(L("マップ表示")+": "+model.mapLayer.title)
+                Toggle(isOn:$model.powerOverlay) { Label(L("電力表示"),systemImage:"bolt") }.help(L("区域中心: 黄=通電、赤=未通電。導電タイルには黄色の枠。"))
+                Menu {
+                    Button(L("予算・税率…")) { model.panel = .budget }
+                    Button(L("都市評価…")) { model.panel = .evaluation }
+                    Button(L("履歴グラフ…")) { model.panel = .graphs }
+                    Button(L("都市からのお知らせ…")) { model.panel = .messages }
+                    Button(L("遊び方…")) { model.panel = .guide }
+                } label: { Label(L("都市情報"),systemImage:"info.circle") }
             }
         }
-        .sheet(item:$model.panel) { CityPanels(model:model,panel:$0) }
-        .confirmationDialog("\(model.pendingDisaster?.title ?? "災害")を発生させますか？",isPresented:Binding(get:{ model.pendingDisaster != nil },set:{ if !$0 { model.pendingDisaster=nil } })) {
+        .sheet(item:$model.panel) { CityPanels(model:model,panel:$0).id(language) }
+        .confirmationDialog(L("%@を発生させますか？",model.pendingDisaster?.title ?? L("災害")),isPresented:Binding(get:{ model.pendingDisaster != nil },set:{ if !$0 { model.pendingDisaster=nil } })) {
             if let disaster=model.pendingDisaster {
-                Button("発生させる",role:.destructive) { Task { await model.trigger(disaster) }; model.pendingDisaster=nil }
+                Button(L("発生させる"),role:.destructive) { Task { await model.trigger(disaster) }; model.pendingDisaster=nil }
             }
-        } message: { Text("都市が被害を受けます。取り消せません。") }
-        .alert("操作できませんでした",isPresented:Binding(get:{ model.errorMessage != nil },set:{ if !$0 { model.errorMessage=nil } })) {
+        } message: { Text(L("都市が被害を受けます。取り消せません。")) }
+        .alert(L("操作できませんでした"),isPresented:Binding(get:{ model.errorMessage != nil },set:{ if !$0 { model.errorMessage=nil } })) {
             Button("OK") { model.errorMessage=nil }
         } message: { Text(model.errorMessage ?? "") }
         .task { await model.run() }
@@ -77,25 +105,5 @@ extension FocusedValues {
     var cityModel: CityModel? {
         get { self[CityModelFocusKey.self] }
         set { self[CityModelFocusKey.self]=newValue }
-    }
-}
-
-private struct DemandBars: View {
-    let details: CityDetails
-    var body: some View {
-        Canvas { context,size in
-            let values=[details.residentialDemand,details.commercialDemand,details.industrialDemand]
-            let colors: [Color]=[.green,.blue,.orange]
-            let center=size.height/2
-            context.stroke(Path(CGRect(x:0,y:center,width:size.width,height:0)),with:.color(.secondary),lineWidth:1)
-            for i in 0..<3 {
-                let demand=Double(values[i])/2000
-                let height=min(1,abs(demand))*center
-                let rect=CGRect(x:Double(i)*12+2,y:demand>=0 ? center-height : center,width:8,height:height)
-                context.fill(Path(rect),with:.color(colors[i]))
-            }
-        }.frame(width:36,height:28)
-        .help("需要: 住宅 \(details.residentialDemand)、商業 \(details.commercialDemand)、工業 \(details.industrialDemand)")
-        .accessibilityLabel("住宅・商業・工業の需要")
     }
 }

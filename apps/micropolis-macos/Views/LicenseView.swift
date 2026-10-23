@@ -6,12 +6,12 @@ struct LicenseView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Micropolis Native macOS").font(.title)
-                Text("2026-10-22に更新した変更版です。Electronic Artsの製品ではありません。")
+                Text(L("2026-10-22に更新した変更版です。Electronic Artsの製品ではありません。"))
                 Text("Copyright (C) 1989–2007 Electronic Arts Inc. (underlying engine)")
-                Text("GPL version 3 or laterおよびEA追加条件の下で提供されます。無保証です。ソースとビルド手順は、このアプリを含むmicropolis-native-macosリポジトリにあります。")
+                Text(L("GPL version 3 or laterおよびEA追加条件の下で提供されます。無保証です。ソースとビルド手順は、このアプリを含むmicropolis-native-macosリポジトリにあります。"))
                 Text("Micropolis is a registered trademark of Micropolis Corporation (Micropolis GmbH) and is licensed here as a courtesy of the owner under the Micropolis Public Name License.")
                 Link("Micropolis", destination: URL(string: "https://www.micropolis.com")!)
-                Text("画像・音声：GPL公開版Micropolisのtiles.xpmおよびobj1〜7のXPMを無損失PNG変換し、res/soundsのWAVを同梱。Copyright (C) 1989–2007 Electronic Arts Inc.。GPL version 3 or laterとEA追加条件。原画像・出典・変換スクリプトを対応ソースに含めます。")
+                Text(L("画像・音声：GPL公開版Micropolisのtiles.xpmおよびobj1〜7のXPMを無損失PNG変換し、res/soundsのWAVを同梱。Copyright (C) 1989–2007 Electronic Arts Inc.。GPL version 3 or laterとEA追加条件。原画像・出典・変換スクリプトを対応ソースに含めます。"))
                 ForEach(["ASSET-NOTICE.ja.md", "UPSTREAM-README.txt", "UPSTREAM-COPYING.txt", "provenance.json", "Gameplay/ASSET-NOTICE.ja.md", "Gameplay/provenance.json"],id:\.self) { name in
                     if let url=Bundle.main.resourceURL?.appendingPathComponent("OriginalGraphics/\(name)"),
                        let text=try? String(contentsOf:url,encoding:.utf8) {

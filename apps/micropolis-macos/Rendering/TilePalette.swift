@@ -38,13 +38,13 @@ enum TilePalette {
         case 418: "+"
         case 427..<612: "C"
         case 616..<693: "I"
-        case 698: "港"
-        case 716: "空"
-        case 750: "炭"
-        case 765: "消"
-        case 774: "警"
-        case 784, 800: "球"
-        case 816: "核"
+        case 698: L("港")
+        case 716: L("空")
+        case 750: L("炭")
+        case 765: L("消")
+        case 774: L("警")
+        case 784, 800: L("球")
+        case 816: L("核")
         default: nil
         }
     }

@@ -40,6 +40,7 @@ func require(_ condition: Bool,_ message: String) throws {
         }
         let session=EngineSession()
         let base=try await session.execute(.generate(seed:12345,speed:3))
+        try statusBarLayout(base)
         let geometry=MapGeometry(size:CGSize(width:1920,height:1600))
         let renderer=TileImageRenderer(atlas:atlas)
         var tiles=(0..<12000).map { UInt16($0%1024) }
@@ -47,6 +48,11 @@ func require(_ condition: Bool,_ message: String) throws {
         let chunks=await renderer.render(tiles,region:TileRegion(geometry))
         let firstTime=start.duration(to:.now)
         try require(chunks.count==56,"bounded full-map chunks")
+        try require(chunks.allSatisfy { $0.matches(tiles) },"cached chunks match live map")
+        var previewTiles=tiles;previewTiles[0]=(previewTiles[0]+1)&1023
+        try require(!chunks[0].matches(previewTiles),"stale image cannot cover new construction preview")
+        previewTiles=tiles;previewTiles[0] ^= 0x8000
+        try require(chunks[0].matches(previewTiles),"status flags alone do not invalidate tile art")
         for chunk in chunks {
             let bytes=chunk.image.dataProvider!.data! as Data
             for ty in 0..<chunk.height { for tx in 0..<chunk.width {
@@ -83,6 +89,22 @@ func require(_ condition: Bool,_ message: String) throws {
         // Render the actual Canvas synchronously at 1x and Retina 2x.
         let plain=(0..<12000).map { UInt16($0%956) }
         let plainChunks=await renderer.render(plain,region:TileRegion(geometry))
+        // A chunk may lag one animation/construction frame behind the engine.
+        // Rendering must match a fresh chunk, never flash a whole region to colors.
+        var previous=plainChunks
+        for tick in 0..<8 {
+            var changed=plain
+            changed[50*120+60]=UInt16(916+tick) // Animated facility cell.
+            changed[50*120+61]=UInt16(64+tick) // Neighboring connection change.
+            let next=copy(base,tiles:changed)
+            let fresh=await renderer.render(changed,region:TileRegion(geometry))
+            let lagging=ImageRenderer(content:TileMapCanvas(frame:next,geometry:geometry,power:false,chunks:previous,tileAtlas:atlas,asynchronous:false).frame(width:1920,height:1600))
+            let current=ImageRenderer(content:TileMapCanvas(frame:next,geometry:geometry,power:false,chunks:fresh,tileAtlas:atlas,asynchronous:false).frame(width:1920,height:1600))
+            guard let laggingImage=lagging.cgImage, let currentImage=current.cgImage else { throw GraphicsTestError.failed("animation patch Canvas") }
+            try require(zip(rgba(laggingImage),rgba(currentImage)).allSatisfy { abs(Int($0)-Int($1))<=2 },"lagging animated chunks match current graphics without fallback flash")
+            previous=fresh
+        }
+        print("PASS eight animated/connected tile updates with stale chunk images: identical to fresh Canvas, no region fallback")
         let frame=copy(base,tiles:plain)
         for scale: CGFloat in [1,2] {
             let surface=TileMapCanvas(frame:frame,geometry:geometry,power:false,chunks:plainChunks,asynchronous:false)
@@ -175,6 +197,29 @@ func require(_ condition: Bool,_ message: String) throws {
         let haightRenderer=ImageRenderer(content:TileMapCanvas(frame:haight,geometry:geometry,power:false,chunks:haightChunks,asynchronous:false).frame(width:1920,height:1600))
         try write(haightRenderer.cgImage!,to:output.appendingPathComponent("haight.png"))
         print("PASS actual Canvas at 1x/2x, orientation, nearest pixels, pan/zoom/resize, fallback, saved city/haight rendering and 200 simulation/render updates")
+    }
+    @MainActor static func statusBarLayout(_ base: CityFrame) throws {
+        let small=CityFrame(tiles:base.tiles,funds:1,population:1,populationPending:false,time:base.time,year:base.year,month:base.month,speed:base.speed,paused:true,details:base.details,revision:base.revision)
+        let large=CityFrame(tiles:base.tiles,funds:2_000_000_000,population:9_999_999,populationPending:false,time:base.time,year:base.year,month:base.month,speed:base.speed,paused:true,details:base.details,revision:base.revision)
+        var previousHeight=Int.max
+        for width in [320,640,1000] {
+            let first=ImageRenderer(content:CityStatusBar(frame:small).frame(width:CGFloat(width)))
+            let second=ImageRenderer(content:CityStatusBar(frame:large).frame(width:CGFloat(width)))
+            guard let a=first.cgImage,let b=second.cgImage else { throw GraphicsTestError.failed("status grid snapshot") }
+            try require(a.width==b.width && a.height==b.height,"number of digits never changes status layout dimensions")
+            let pa=rgba(a),pb=rgba(b)
+            // The headings precede values in every fixed-height row. Their
+            // rendered positions must remain identical when values grow.
+            for rowTop in stride(from:12,to:a.height-12,by:78) {
+                for y in rowTop..<min(rowTop+38,a.height) {
+                    let start=y*a.width*4,end=(y+1)*a.width*4
+                    try require(pa[start..<end].elementsEqual(pb[start..<end]),"funds/population updates never move status headings")
+                }
+            }
+            try require(a.height<=previousHeight,"wider detail uses fewer status rows")
+            previousHeight=a.height
+        }
+        print("PASS status grid at 320/640/1000pt: digit-independent headings and width-dependent wrapping")
     }
     static func copy(_ f: CityFrame,tiles: [UInt16]) -> CityFrame {
         CityFrame(tiles:tiles,funds:f.funds,population:f.population,populationPending:f.populationPending,time:f.time,year:f.year,month:f.month,speed:f.speed,paused:f.paused,details:f.details,revision:f.revision)

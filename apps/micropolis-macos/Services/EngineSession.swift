@@ -12,12 +12,13 @@ struct EngineFailure: Error, Sendable, CustomStringConvertible {
     }
     var description: String {
         switch code {
-        case Int32(MP_BUDGET_PENDING): "年次予算を承認してから保存してください。都市の状態は保持されています。"
-        case Int32(MP_NO_FUNDS): "資金が不足しています。"
-        case Int32(MP_NEEDS_BULLDOZE): "先に撤去してください。"
-        case Int32(MP_CANNOT_BUILD): "この場所には建設できません。"
+        case Int32(MP_BUDGET_PENDING): L("年次予算を承認してから保存してください。都市の状態は保持されています。")
+        case Int32(MP_IO_ERROR): L("都市ファイルを読み書きできませんでした。形式とアクセス権を確認してください。")
+        case Int32(MP_NO_FUNDS): L("資金が不足しています。")
+        case Int32(MP_NEEDS_BULLDOZE): L("先に撤去してください。")
+        case Int32(MP_CANNOT_BUILD): L("この場所には建設できません。")
         case Int32(MP_OUT_OF_MEMORY), Int32(MP_INTERNAL_ERROR):
-            retiresSession ? "エンジンを継続できません。新規都市を作成してください。" : "都市を置き換えられませんでした。現在の都市は保持されています。"
+            retiresSession ? L("エンジンを継続できません。新規都市を作成してください。") : L("都市を置き換えられませんでした。現在の都市は保持されています。")
         default: String(cString: mp_result_string(code))
         }
     }
@@ -311,5 +312,5 @@ actor EngineSession {
 }
 
 private struct FileChangedError: Error, Sendable, CustomStringConvertible {
-    var description: String { "保存先が外部で変更されています。上書きを防ぐため保存しませんでした。「別名で保存」で別の名前を選んでください。" }
+    var description: String { L("保存先が外部で変更されています。上書きを防ぐため保存しませんでした。「別名で保存」で別の名前を選んでください。") }
 }

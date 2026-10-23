@@ -104,9 +104,9 @@ final class RecentCities {
     private static func mayDiscard(_ model: CityModel, window: NSWindow?) async -> Bool {
         guard model.dirty else { return true }
         let alert=NSAlert()
-        alert.messageText="「\(model.title)」の変更を保存しますか？"
-        alert.informativeText="保存しない変更は失われます。"
-        alert.addButton(withTitle:"保存"); alert.addButton(withTitle:"キャンセル"); alert.addButton(withTitle:"保存しない")
+        alert.messageText=L("「%@」の変更を保存しますか？",model.title)
+        alert.informativeText=L("保存しない変更は失われます。")
+        alert.addButton(withTitle:L("保存")); alert.addButton(withTitle:L("キャンセル")); alert.addButton(withTitle:L("保存しない"))
         alert.buttons[2].hasDestructiveAction=true
         let response: NSApplication.ModalResponse
         if let window { response=await alert.beginSheetModal(for:window) }
@@ -119,19 +119,19 @@ final class RecentCities {
     }
     private static func saveLocked(_ model: CityModel, window: NSWindow?, saveAs: Bool) async -> Bool {
         guard !model.engineFailed else {
-            model.errorMessage="エンジンに障害があるため保存できません。元のファイルは変更していません。"; return false
+            model.errorMessage=L("エンジンに障害があるため保存できません。元のファイルは変更していません。"); return false
         }
         var target=saveAs ? nil : model.fileURL
         if target == nil {
             let panel=NSSavePanel()
             panel.allowedContentTypes=[cityType]; panel.canCreateDirectories=true
-            panel.nameFieldStringValue=(model.fileURL?.lastPathComponent ?? "名称未設定.cty")
+            panel.nameFieldStringValue=(model.fileURL?.lastPathComponent ?? L("名称未設定.cty"))
             guard await present(panel,window:window) == .OK else { return false }
             target=panel.url
         }
         guard let target else { return false }
         if focusExisting(target,excluding:model) {
-            model.errorMessage="保存先は別のウインドウで開いています。別の名前で保存してください。"; return false
+            model.errorMessage=L("保存先は別のウインドウで開いています。別の名前で保存してください。"); return false
         }
         guard await model.save(to:target) else { return false }
         RecentCities.shared.remember(target)

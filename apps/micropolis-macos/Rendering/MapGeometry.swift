@@ -49,6 +49,12 @@ struct MapViewport {
                    height:anchor.y-fresh.rect.minY-wy*fresh.tileSize)
         clamp(size)
     }
+    mutating func center(at point: CGPoint, size: CGSize) {
+        let g=MapGeometry(size:size,zoom:zoom)
+        pan=CGSize(width:size.width/2-g.rect.minX-point.x*g.tileSize,
+                   height:size.height/2-g.rect.minY-point.y*g.tileSize)
+        clamp(size)
+    }
     mutating func clamp(_ size: CGSize) {
         let g=MapGeometry(size:size,zoom:zoom)
         let x=max(0,(g.rect.width-size.width)/2), y=max(0,(g.rect.height-size.height)/2)
@@ -76,4 +82,20 @@ enum MapPath {
         }
         return result
     }
+}
+
+/// Keeps the grabbed position within the overview frame under the pointer.
+struct OverviewDrag {
+    private var offset: CGSize?
+    mutating func center(start: CGPoint, current: CGPoint, geometry: MapGeometry, viewport: CGRect) -> CGPoint? {
+        guard geometry.tileSize>0, !viewport.isNull else { return nil }
+        let first=CGPoint(x:(start.x-geometry.rect.minX)/geometry.tileSize,y:(start.y-geometry.rect.minY)/geometry.tileSize)
+        if offset == nil {
+            guard geometry.rect.contains(start) else { return nil }
+            offset=viewport.contains(first) ? CGSize(width:viewport.midX-first.x,height:viewport.midY-first.y) : .zero
+        }
+        return CGPoint(x:max(0,min(120,(current.x-geometry.rect.minX)/geometry.tileSize+offset!.width)),
+                       y:max(0,min(100,(current.y-geometry.rect.minY)/geometry.tileSize+offset!.height)))
+    }
+    mutating func end() { offset=nil }
 }

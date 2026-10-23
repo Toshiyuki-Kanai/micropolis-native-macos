@@ -32,47 +32,29 @@ struct CityMapView: View {
                     model.cancelStroke(); hover=nil; viewport.magnify(factor,at:point,size:proxy.size)
                 })
                 .allowsHitTesting(model.acceptsMapInput)
-                .accessibilityLabel("都市マップ、120列100行。クリック・ドラッグで建設。右ドラッグまたはトラックパッドで移動。")
+                .accessibilityLabel(L("都市マップ、120列100行。クリック・ドラッグで建設。右ドラッグまたはトラックパッドで移動。"))
+                if model.previewFrame != nil || model.mapLayer != .all {
                 VStack(alignment:.trailing,spacing:8) {
                 if model.previewFrame != nil {
-                    Text("建設費用 \(model.previewCost)\(model.previewInsufficientFunds ? " · 資金不足" : "")")
+                    Text(L("建設費用 %@%@",model.previewCost,model.previewInsufficientFunds ? L(" · 資金不足") : ""))
                         .foregroundStyle(model.previewInsufficientFunds ? .red : .primary)
-                    Text("マウスを離すと確定 · Escで取消").font(.caption)
-                }
-                Picker("マップ表示",selection:Binding(get:{ model.mapLayer },set:{ model.mapLayer=$0 })) {
-                    ForEach(CityMapLayer.allCases) { layer in Text(layer.title).tag(layer) }
-                }.frame(width:170)
-                if model.showOverview, let f=model.frame {
-                    let mini=MapGeometry(size:CGSize(width:180,height:150))
-                    CivicMapCanvas(frame:f,geometry:mini,layer:model.mapLayer,values:model.overlayValues,overview:true)
-                        .frame(width:180,height:150).background(.black)
-                        .overlay {
-                            let visible=CGRect(x:max(0,-g.rect.minX/g.tileSize)*1.5,y:max(0,-g.rect.minY/g.tileSize)*1.5,
-                                               width:min(120,proxy.size.width/g.tileSize)*1.5,height:min(100,proxy.size.height/g.tileSize)*1.5)
-                            Path(visible).stroke(.white,lineWidth:1)
-                        }
-                        .gesture(DragGesture(minimumDistance:0).onChanged { value in
-                            if let p=mini.tile(at:value.location) { model.focusPoint=MapPoint(x:p.x,y:p.y) }
-                        })
-                        .accessibilityLabel("概観マップ。クリックまたはドラッグで表示位置を移動。")
+                    Text(L("マウスを離すと確定 · Escで取消")).font(.caption)
                 }
                 if model.mapLayer != .all {
-                    Text(model.mapLayer == .growth ? "緑: 成長　橙・黄: 減少" : model.mapLayer == .power ? "赤: 通電　青: 未通電　灰: 導電" : "灰 → 黄 → 橙 → 赤: 値が大きい")
+                    Text(model.mapLayer == .growth ? L("緑: 成長　橙・黄: 減少") : model.mapLayer == .power ? L("赤: 通電　青: 未通電　灰: 導電") : L("灰 → 黄 → 橙 → 赤: 値が大きい"))
                         .font(.caption).frame(maxWidth:220)
                 }
-                HStack(spacing:8) {
-                    Text("\(Int(viewport.zoom*100))%") .monospacedDigit()
-                    Button { viewport.magnify(1/1.3,at:CGPoint(x:proxy.size.width/2,y:proxy.size.height/2),size:proxy.size) } label: { Image(systemName:"minus.magnifyingglass") }
-                    Button { viewport.magnify(1.3,at:CGPoint(x:proxy.size.width/2,y:proxy.size.height/2),size:proxy.size) } label: { Image(systemName:"plus.magnifyingglass") }
-                    Button("全体") { viewport=MapViewport() }
-                }
+
                 }
                 .buttonStyle(.borderless).padding(8).background(.regularMaterial,in:RoundedRectangle(cornerRadius:8)).padding(8)
+                }
             }
             .clipped()
             .onChange(of:g.rect,initial:true) { _,_ in
+                model.mapZoom=viewport.zoom
                 if g.tileSize>0 {
                     model.visibleTiles=CGRect(x:-g.rect.minX/g.tileSize,y:-g.rect.minY/g.tileSize,width:proxy.size.width/g.tileSize,height:proxy.size.height/g.tileSize)
+                    model.overviewViewport=model.visibleTiles.intersection(CGRect(x:0,y:0,width:120,height:100))
                 }
             }
             .onChange(of:model.focusPoint) { _,point in
@@ -85,6 +67,14 @@ struct CityMapView: View {
             }
             .onChange(of:model.zoomCommand) { old,new in
                 viewport.magnify(new>old ? 1.3 : 1/1.3,at:CGPoint(x:proxy.size.width/2,y:proxy.size.height/2),size:proxy.size)
+            }
+            .onChange(of:model.overviewCenter) { _,point in
+                guard let point else { return }
+                model.cancelStroke(); hover=nil
+                viewport.center(at:point,size:proxy.size)
+            }
+            .onChange(of:model.fitCommand) { _,_ in
+                model.cancelStroke(); hover=nil; viewport=MapViewport()
             }
             .onChange(of:model.tool) { _,_ in model.cancelStroke() }
             .onChange(of:proxy.size) { _,size in viewport.clamp(size); hover=nil }

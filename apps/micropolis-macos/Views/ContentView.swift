@@ -5,12 +5,13 @@ struct ContentView: View {
     @Bindable var model: CityModel
     @AppStorage("appAppearance") private var appearance="system"
     @AppStorage("appLanguage") private var language="system"
+    @State private var availableWidth: CGFloat = 950
     @State private var columns: NavigationSplitViewVisibility = .all
     private var window: NSWindow? { CityWindows.shared.window(for:model) }
     var body: some View {
         NavigationSplitView(columnVisibility:$columns) {
             CitySidebar(model:model)
-                .navigationSplitViewColumnWidth(min:210,ideal:260,max:2000)
+                .navigationSplitViewColumnWidth(min:210,ideal:260,max:max(210,min(availableWidth*0.75,availableWidth-320)))
                 .navigationTitle("")
         } detail: {
             VStack(spacing:0) {
@@ -38,12 +39,14 @@ struct ContentView: View {
             .navigationTitle(model.title)
         }
         .navigationSplitViewStyle(.balanced)
+        .frame(width:availableWidth)
         .id(language)
         .preferredColorScheme(appearance == "system" ? nil : appearance == "dark" ? .dark : .light)
         .environment(\.locale,Locale(identifier:AppText.language))
         .onChange(of:language) { _,_ in model.refreshLanguage() }
         .frame(minWidth:950,minHeight:650)
         .background(CityWindowBridge(model:model).frame(width:0,height:0))
+        .background(WindowWidthReader(width:$availableWidth).frame(width:0,height:0))
         .toolbar {
             ToolbarItemGroup(placement:.navigation) {
                 Button { Task { await CityFiles.newCity(model,window:window) } } label: { Label(L("新規都市"),systemImage:"plus") }.disabled(model.documentBusy)
@@ -105,5 +108,34 @@ extension FocusedValues {
     var cityModel: CityModel? {
         get { self[CityModelFocusKey.self] }
         set { self[CityModelFocusKey.self]=newValue }
+    }
+}
+
+/// Read the NSWindow, not the split view's intrinsic width, which can grow while dragging.
+private struct WindowWidthReader: NSViewRepresentable {
+    @Binding var width: CGFloat
+    func makeNSView(context: Context) -> WidthView { WidthView() }
+    func updateNSView(_ view: WidthView, context: Context) {
+        view.changed={ width=$0 }
+        view.publishWidth()
+    }
+    final class WidthView: NSView {
+        var changed: ((CGFloat)->Void)?
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            NotificationCenter.default.removeObserver(self)
+            if let window {
+                NotificationCenter.default.addObserver(self,selector:#selector(resized),name:NSWindow.didResizeNotification,object:window)
+                publishWidth()
+            }
+        }
+        @objc private func resized(_ notification: Notification) { publishWidth() }
+        func publishWidth() {
+            // SwiftUI state must not change during updateNSView/layout.
+            Task { @MainActor [weak self] in
+                guard let self, let width=window?.contentView?.bounds.width, width>0 else { return }
+                changed?(width)
+            }
+        }
     }
 }

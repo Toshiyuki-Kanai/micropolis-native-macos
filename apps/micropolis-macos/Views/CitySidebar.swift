@@ -4,7 +4,7 @@ import SwiftUI
 struct CitySidebar: View {
     @Bindable var model: CityModel
     @Environment(\.colorScheme) private var colorScheme
-    private var sidebarBackground: Color { Color(white:colorScheme == .dark ? 0.16 : 0.92) }
+    private var sidebarBackground: Color { Color(white:colorScheme == .dark ? 0.22 : 0.92) }
     @State private var overviewDrag=OverviewDrag()
     var body: some View {
         VSplitView {
@@ -50,6 +50,7 @@ struct CitySidebar: View {
                 }.padding(12).frame(minHeight:110,idealHeight:210,maxHeight:.infinity).background(sidebarBackground)
             }
         }
+        .frame(maxWidth:.infinity,alignment:.leading)
         .background(sidebarBackground)
     }
 }

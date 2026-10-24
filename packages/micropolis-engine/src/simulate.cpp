@@ -1500,9 +1500,9 @@ void Micropolis::doSpecialZone(const Position &pos, bool powerOn)
             }
 
             if (powerOn) {
-                z = fireEffect;                   /* if powered get effect  */
+                z = static_cast<int>(fireEffect);                   /* if powered get effect  */
             } else {
-                z = fireEffect / 2;               /* from the funding ratio  */
+                z = static_cast<int>(fireEffect / 2);               /* from the funding ratio  */
             }
 
             Position pos2(pos);
@@ -1530,9 +1530,9 @@ void Micropolis::doSpecialZone(const Position &pos, bool powerOn)
             }
 
             if (powerOn) {
-                z = policeEffect;
+                z = static_cast<int>(policeEffect);
             } else {
-                z = policeEffect / 2;
+                z = static_cast<int>(policeEffect / 2);
             }
 
             Position pos2(pos);

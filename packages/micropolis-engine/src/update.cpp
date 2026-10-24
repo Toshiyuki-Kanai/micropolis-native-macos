@@ -141,7 +141,8 @@ void Micropolis::reallyUpdateFunds()
     if (totalFunds != totalFundsLast) {
         totalFundsLast = totalFunds;
 
-        callback->updateFunds(this, callbackVal, totalFunds);
+        // Keep the existing signed 32-bit frontend callback contract.
+        callback->updateFunds(this, callbackVal, static_cast<int>(totalFunds));
     }
 
 }
@@ -178,7 +179,8 @@ void Micropolis::updateDate()
         cityYearLast = cityYear;
         cityMonthLast = cityMonth;
 
-        callback->updateDate(this, callbackVal, cityYear, cityMonth);
+        callback->updateDate(this, callbackVal, static_cast<int>(cityYear),
+                             static_cast<int>(cityMonth));
     }
 }
 

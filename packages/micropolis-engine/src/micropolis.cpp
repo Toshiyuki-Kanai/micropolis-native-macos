@@ -1049,7 +1049,8 @@ void Micropolis::simulateRobots()
  */
 void Micropolis::spend(int dollars)
 {
-    setFunds(totalFunds - dollars);
+    // setFunds and the legacy funds callback use signed 32-bit values.
+    setFunds(static_cast<int>(totalFunds - dollars));
 }
 
 

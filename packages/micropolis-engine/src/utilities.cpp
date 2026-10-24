@@ -251,9 +251,7 @@ void Micropolis::setCityName(const std::string &name)
 {
     std::string cleanName;
 
-    int i;
-    int n = name.length();
-    for (i = 0; i < n; i++) {
+    for (std::string::size_type i = 0; i < name.length(); i++) {
         char ch = name[i];
         if (!isalnum(ch)) {
             ch = '_';
@@ -284,8 +282,8 @@ void Micropolis::setYear(int year)
         year = startingYear;
     }
 
-    year = (year - startingYear) - (cityTime / 48);
-    cityTime += year * 48;
+    const Quad yearDelta = (static_cast<Quad>(year) - startingYear) - (cityTime / 48);
+    cityTime += yearDelta * 48;
     doTimeStuff();
 }
 
@@ -296,7 +294,7 @@ void Micropolis::setYear(int year)
  */
 int Micropolis::currentYear()
 {
-    return (cityTime / 48) + startingYear;
+    return static_cast<int>((cityTime / 48) + startingYear);
 }
 
 

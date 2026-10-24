@@ -11,6 +11,7 @@
 #include <new>
 #include <cstdint>
 #include <cmath>
+#include <filesystem>
 
 #define REQUIRE(expr) do { if (!(expr)) throw std::runtime_error(#expr); } while (0)
 static std::vector<unsigned char> bytes(const std::string &path) {
@@ -142,6 +143,26 @@ int main(int argc, char **argv) {
             for(int i=0;i<1100;++i) m->simTick();
         }
         std::printf("PASS eight bundled scenario files, 1100 ticks each\n");
+        // Exercise the legacy entrypoint itself, not only loadCity: constructing
+        // its local std::strings from NULL used to fail before any file I/O.
+        const auto previousDirectory = std::filesystem::current_path();
+        std::filesystem::current_path(std::filesystem::path(repo) / "content/micropolis");
+        for (int scenario = SC_DULLSVILLE; scenario <= SC_RIO; ++scenario) {
+            m->init();
+            m->loadScenario(static_cast<Scenario>(scenario));
+            REQUIRE(m->scenario == scenario);
+            REQUIRE(!m->cityName.empty());
+        }
+        std::filesystem::current_path(previousDirectory);
+        m->setYear(2050); REQUIRE(m->currentYear() == 2050);
+        m->setYear(-1); REQUIRE(m->currentYear() == m->startingYear);
+        m->setCityName(std::string(100000, 'A'));
+        REQUIRE(m->cityName.size() == 100000);
+        m->setFunds(2147483647); m->spend(10);
+        REQUIRE(m->totalFunds == 2147483637);
+        m->setFunds(-2147483647); m->spend(1);
+        REQUIRE(m->totalFunds == -2147483647 - 1);
+        std::printf("PASS direct scenario entrypoint, year reset, long names and signed funds boundaries\n");
         return 0;
     } catch (const std::exception &e) { std::fprintf(stderr,"FAIL core: %s\n",e.what()); return 1; }
 }

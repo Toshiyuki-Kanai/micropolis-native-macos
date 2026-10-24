@@ -166,7 +166,8 @@ void Micropolis::randomlySeedRandom()
 {
     struct timeval time;
     gettimeofday(&time, NULL);
-    seedRandom(time.tv_usec ^ time.tv_sec);
+    // Preserve the legacy 32-bit seed when time_t is 64-bit.
+    seedRandom(static_cast<int>(time.tv_usec ^ time.tv_sec));
 }
 
 

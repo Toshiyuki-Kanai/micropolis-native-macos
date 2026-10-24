@@ -291,8 +291,8 @@ bool Micropolis::saveFile(const std::string &filename)
  */
 void Micropolis::loadScenario(Scenario s)
 {
-    std::string name = NULL;
-    std::string fname = NULL;
+    std::string name;
+    std::string fname;
 
     cityFileName = "";
 

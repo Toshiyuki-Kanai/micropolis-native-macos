@@ -304,5 +304,10 @@
   "人口": "Population",
   "年月": "Year / Month",
   "需要": "Demand",
-  "状態": "Status"
+  "状態": "Status",
+  "Micropolis for macOSについて": "About Micropolis for macOS",
+  "非公式のmacOSネイティブ移植版です。Electronic ArtsおよびMicropolis商標権者による公式リリースではありません。": "An unofficial native macOS adaptation. This is not an official release by Electronic Arts or the Micropolis trademark owner.",
+  "ソースコード・ビルド手順": "Source code and build instructions",
+  "名称使用条件およびGitHub Releasesでの使用の最終確認は未完了です。個別の使用許諾取得や正式公開の承認を示すものではありません。": "Final review of the name-use conditions, including use on GitHub Releases, is pending. This notice does not claim an individually obtained permission or approval for public release.",
+  "2026-10-25に更新した変更版です。Electronic Artsの製品ではありません。": "Modified version updated on 2026-10-25. Not a product of Electronic Arts."
 }

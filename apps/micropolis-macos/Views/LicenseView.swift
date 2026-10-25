@@ -5,8 +5,13 @@ struct LicenseView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Micropolis Native macOS").font(.title)
-                Text(L("2026-10-22に更新した変更版です。Electronic Artsの製品ではありません。"))
+                Text("Micropolis for macOS").font(.title)
+                Text("Version \(Bundle.main.object(forInfoDictionaryKey:"CFBundleShortVersionString") as? String ?? "—") (Build \(Bundle.main.object(forInfoDictionaryKey:"CFBundleVersion") as? String ?? "—"))")
+                    .font(.headline)
+                Text(L("非公式のmacOSネイティブ移植版です。Electronic ArtsおよびMicropolis商標権者による公式リリースではありません。"))
+                Link(L("ソースコード・ビルド手順"),destination:URL(string:"https://github.com/Toshiyuki-Kanai/micropolis-native-macos")!)
+                Text(L("名称使用条件およびGitHub Releasesでの使用の最終確認は未完了です。個別の使用許諾取得や正式公開の承認を示すものではありません。"))
+                Text(L("2026-10-25に更新した変更版です。Electronic Artsの製品ではありません。"))
                 Text("Copyright (C) 1989–2007 Electronic Arts Inc. (underlying engine)")
                 Text(L("GPL version 3 or laterおよびEA追加条件の下で提供されます。無保証です。ソースとビルド手順は、このアプリを含むmicropolis-native-macosリポジトリにあります。"))
                 Text("Micropolis is a registered trademark of Micropolis Corporation (Micropolis GmbH) and is licensed here as a courtesy of the owner under the Micropolis Public Name License.")

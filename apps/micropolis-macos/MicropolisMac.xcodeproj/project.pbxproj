@@ -1,98 +1,358 @@
 // !$*UTF8*$!
 {
 	archiveVersion = 1;
-	classes = {};
-	objectVersion = 56;
-	objects = {
-		3A87D6126F4350BDA76E8286 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/CityStatusBar.swift"; sourceTree = "<group>"; };
-		619E60F363C14488757C6BAB = { isa = PBXBuildFile; fileRef = 3A87D6126F4350BDA76E8286; };
-		65591B3B302E7226A87D4B23 = { isa = PBXFileReference; lastKnownFileType = folder; path = "Resources/Localization"; sourceTree = "<group>"; };
-		9A48BCDE219E5204848DD51E = { isa = PBXBuildFile; fileRef = 65591B3B302E7226A87D4B23; };
-
-		968AC7B86EC4AD9E69A53A5F = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/AppearanceSettings.swift"; sourceTree = "<group>"; };
-		DB6EF2035DD922544108B6C5 = { isa = PBXBuildFile; fileRef = 968AC7B86EC4AD9E69A53A5F; };
-
-		1F7A4CCEBAADA1240A66171C = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/CitySidebar.swift"; sourceTree = "<group>"; };
-		E9E95A31C0787A3CF6C6F25F = { isa = PBXBuildFile; fileRef = 1F7A4CCEBAADA1240A66171C; };
-
-		97623464B2514D4D91148E9F = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/AppText.swift"; sourceTree = "<group>"; };
-		45B47B3617ACCA841E14A9FE = { isa = PBXBuildFile; fileRef = 97623464B2514D4D91148E9F; };
-
-		C61EDD12021B57C403ACF2BD = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Rendering/TileAtlas.swift"; sourceTree = "<group>"; };
-		1857FD00B1D099B3065BC917 = { isa = PBXBuildFile; fileRef = C61EDD12021B57C403ACF2BD; };
-		09DF66CE408AD94B144320C8 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Rendering/TerrainCanvas.swift"; sourceTree = "<group>"; };
-		11075E696DBBE098D1F27887 = { isa = PBXBuildFile; fileRef = 09DF66CE408AD94B144320C8; };
-		5FA52C7DA733E5F5B65F4DDB = { isa = PBXFileReference; lastKnownFileType = folder; path = "Resources/OriginalGraphics"; sourceTree = "<group>"; };
-		F57C618472332387FEC49EA7 = { isa = PBXBuildFile; fileRef = 5FA52C7DA733E5F5B65F4DDB; };
-		46AEBE05645BAE23A04F20E4 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/CityPanels.swift"; sourceTree = "<group>"; };
-		48B81B38524EC824BE3D9F03 = { isa = PBXBuildFile; fileRef = 46AEBE05645BAE23A04F20E4; };
-		9F5DB426D8C36A5B26090A10 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Rendering/MapInputView.swift"; sourceTree = "<group>"; };
-		289A7174F8B4419D30D863CE = { isa = PBXBuildFile; fileRef = 9F5DB426D8C36A5B26090A10; };
-		049F25DD1E5BD746C6D5A7FE = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/CityWindowBridge.swift"; sourceTree = "<group>"; };
-		485A2A3EA30E644C4085E362 = { isa = PBXBuildFile; fileRef = 049F25DD1E5BD746C6D5A7FE; };
-		A2B0E54B08F6DB22D3B85D8B = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/CityFiles.swift"; sourceTree = "<group>"; };
-		EA6B228D3A19372208428B13 = { isa = PBXBuildFile; fileRef = A2B0E54B08F6DB22D3B85D8B; };
-		2FDB7AE0CA39F9E3ADEEB13A = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App/MicropolisMacApp.swift"; sourceTree = "<group>"; };
-		2599678A41270F0B6996679A = { isa = PBXBuildFile; fileRef = 2FDB7AE0CA39F9E3ADEEB13A; };
-		2D8D0C7B51B1EC8DD9A42575 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/CityFrame.swift"; sourceTree = "<group>"; };
-		CB27C7810F9DDEBEB277DACB = { isa = PBXBuildFile; fileRef = 2D8D0C7B51B1EC8DD9A42575; };
-		899FFDA063295108F4E1BF2F = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/CityModel.swift"; sourceTree = "<group>"; };
-		E09815C304D59A81B99B991C = { isa = PBXBuildFile; fileRef = 899FFDA063295108F4E1BF2F; };
-		939A5EC6A5AD8359D3A68FF0 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Rendering/MapGeometry.swift"; sourceTree = "<group>"; };
-		B43B4C760196860E423F74E5 = { isa = PBXBuildFile; fileRef = 939A5EC6A5AD8359D3A68FF0; };
-		C14A3EEF68A716A31768B9D0 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Rendering/TilePalette.swift"; sourceTree = "<group>"; };
-		5B546E256D141CB24E34C7DD = { isa = PBXBuildFile; fileRef = C14A3EEF68A716A31768B9D0; };
-		C7344DC2E0A7E340AA5B4203 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/EngineSession.swift"; sourceTree = "<group>"; };
-		8059738FC1C706AD7B088EEE = { isa = PBXBuildFile; fileRef = C7344DC2E0A7E340AA5B4203; };
-		C151449BB01E3487D2E4CE8A = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/CityMapView.swift"; sourceTree = "<group>"; };
-		74505E150940911E818520A5 = { isa = PBXBuildFile; fileRef = C151449BB01E3487D2E4CE8A; };
-		B2C1B79D4003562DEF224B48 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/ContentView.swift"; sourceTree = "<group>"; };
-		F7D62745C80E00A1CEF8A549 = { isa = PBXBuildFile; fileRef = B2C1B79D4003562DEF224B48; };
-		C1239705C289BCC35E1311AD = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/LicenseView.swift"; sourceTree = "<group>"; };
-		289D331A391C5EE36C2B441A = { isa = PBXBuildFile; fileRef = C1239705C289BCC35E1311AD; };
-		F0046D3BB7295349AAFCDD05 = { isa = PBXFileReference; lastKnownFileType = text; path = "../../gpl-3.0.txt"; sourceTree = "<group>"; };
-		484A619E8F7E1ECCCCEF22F5 = { isa = PBXBuildFile; fileRef = F0046D3BB7295349AAFCDD05; };
-		68F35E3DD144F3CC14506D98 = { isa = PBXFileReference; lastKnownFileType = text; path = "../../MicropolisGPLLicenseNotice.md"; sourceTree = "<group>"; };
-		83C0F812B4B39F1F2C197517 = { isa = PBXBuildFile; fileRef = 68F35E3DD144F3CC14506D98; };
-		BA1022221120C7BD204DD650 = { isa = PBXFileReference; lastKnownFileType = text; path = "../../MicropolisPublicNameLicense.md"; sourceTree = "<group>"; };
-		95C84992B616AFFE0CE44245 = { isa = PBXBuildFile; fileRef = BA1022221120C7BD204DD650; };
-		38A007151ABE87CC01A5B6E9 = { isa = PBXFileReference; explicitFileType = wrapper.application; path = MicropolisMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		582681C2EAE02B3F3D399C0C = { isa = XCLocalSwiftPackageReference; relativePath = ../../packages/micropolis-engine; };
-		DE58E2B17C19600779694943 = { isa = XCSwiftPackageProductDependency; package = 582681C2EAE02B3F3D399C0C; productName = MicropolisNative; };
-		F178867DA2879CAE0F60630A = { isa = PBXBuildFile; productRef = DE58E2B17C19600779694943; };
-		72A8017E75795FC05F78F54C = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (619E60F363C14488757C6BAB, DB6EF2035DD922544108B6C5, E9E95A31C0787A3CF6C6F25F, 45B47B3617ACCA841E14A9FE, 1857FD00B1D099B3065BC917, 11075E696DBBE098D1F27887, 48B81B38524EC824BE3D9F03, 289A7174F8B4419D30D863CE, 485A2A3EA30E644C4085E362, EA6B228D3A19372208428B13, 2599678A41270F0B6996679A, CB27C7810F9DDEBEB277DACB, E09815C304D59A81B99B991C, B43B4C760196860E423F74E5, 5B546E256D141CB24E34C7DD, 8059738FC1C706AD7B088EEE, 74505E150940911E818520A5, F7D62745C80E00A1CEF8A549, 289D331A391C5EE36C2B441A,); runOnlyForDeploymentPostprocessing = 0; };
-		963488E8A773A44C9A5DC523 = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (9A48BCDE219E5204848DD51E, F57C618472332387FEC49EA7, 484A619E8F7E1ECCCCEF22F5, 83C0F812B4B39F1F2C197517, 95C84992B616AFFE0CE44245,); runOnlyForDeploymentPostprocessing = 0; };
-		F01580CCB5F725E4E879D491 = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (F178867DA2879CAE0F60630A,); runOnlyForDeploymentPostprocessing = 0; };
-		4D820FADAFBC7A1FCACC4F07 = { isa = PBXGroup; children = (3A87D6126F4350BDA76E8286, 65591B3B302E7226A87D4B23, 968AC7B86EC4AD9E69A53A5F, 1F7A4CCEBAADA1240A66171C, 97623464B2514D4D91148E9F, C61EDD12021B57C403ACF2BD, 09DF66CE408AD94B144320C8, 5FA52C7DA733E5F5B65F4DDB, 46AEBE05645BAE23A04F20E4, 9F5DB426D8C36A5B26090A10, 049F25DD1E5BD746C6D5A7FE, A2B0E54B08F6DB22D3B85D8B, 2FDB7AE0CA39F9E3ADEEB13A, 2D8D0C7B51B1EC8DD9A42575, 899FFDA063295108F4E1BF2F, 939A5EC6A5AD8359D3A68FF0, C14A3EEF68A716A31768B9D0, C7344DC2E0A7E340AA5B4203, C151449BB01E3487D2E4CE8A, B2C1B79D4003562DEF224B48, C1239705C289BCC35E1311AD,); name = Sources; sourceTree = "<group>"; };
-		3B91224C671A3400805ED16F = { isa = PBXGroup; children = (F0046D3BB7295349AAFCDD05, 68F35E3DD144F3CC14506D98, BA1022221120C7BD204DD650,); name = Licenses; sourceTree = "<group>"; };
-		BFE00B156DCFC34C4751A6E5 = { isa = PBXGroup; children = (38A007151ABE87CC01A5B6E9,); name = Products; sourceTree = "<group>"; };
-		EDA6D6223944636B9C5B54AA = { isa = PBXGroup; children = (4D820FADAFBC7A1FCACC4F07, 3B91224C671A3400805ED16F, BFE00B156DCFC34C4751A6E5,); sourceTree = "<group>"; };
-		89E1FD6268CC0F221A2BE178 = { isa = XCBuildConfiguration; name = Debug; buildSettings = { ALWAYS_SEARCH_USER_PATHS = NO; MACOSX_DEPLOYMENT_TARGET = 27.0; SDKROOT = macosx; ARCHS = arm64; CLANG_CXX_LANGUAGE_STANDARD = "c++17"; }; };
-		7082CC0B6FC1282FCEABD07A = { isa = XCBuildConfiguration; name = Debug; buildSettings = {
- PRODUCT_NAME = "$(TARGET_NAME)"; PRODUCT_BUNDLE_IDENTIFIER = org.micropolis.native.macos;
- SWIFT_VERSION = 6.0; MARKETING_VERSION = 1.0; CURRENT_PROJECT_VERSION = 1; SWIFT_OPTIMIZATION_LEVEL = "-Onone";
- GENERATE_INFOPLIST_FILE = YES; INFOPLIST_FILE = App/Info.plist; CODE_SIGN_ENTITLEMENTS = App/MicropolisMac.entitlements; INFOPLIST_KEY_CFBundleDisplayName = "Micropolis Native";
- INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.simulation-games";
- INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright (C) 1989–2007 Electronic Arts Inc. (engine). Modified version 2026-10-22, GPL-3.0-or-later with EA additional terms.";
- CODE_SIGN_STYLE = Automatic; CODE_SIGN_IDENTITY = "-"; ENABLE_APP_SANDBOX = YES;
- ENABLE_HARDENED_RUNTIME = YES; COMBINE_HIDPI_IMAGES = YES;
- LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
- }; };
-		E6DE6C99132752C914FEF632 = { isa = XCBuildConfiguration; name = Release; buildSettings = { ALWAYS_SEARCH_USER_PATHS = NO; MACOSX_DEPLOYMENT_TARGET = 27.0; SDKROOT = macosx; ARCHS = arm64; CLANG_CXX_LANGUAGE_STANDARD = "c++17"; }; };
-		639A7CA24D39909E713B47F7 = { isa = XCBuildConfiguration; name = Release; buildSettings = {
- PRODUCT_NAME = "$(TARGET_NAME)"; PRODUCT_BUNDLE_IDENTIFIER = org.micropolis.native.macos;
- SWIFT_VERSION = 6.0; MARKETING_VERSION = 1.0; CURRENT_PROJECT_VERSION = 1; SWIFT_OPTIMIZATION_LEVEL = "-O";
- GENERATE_INFOPLIST_FILE = YES; INFOPLIST_FILE = App/Info.plist; CODE_SIGN_ENTITLEMENTS = App/MicropolisMac.entitlements; INFOPLIST_KEY_CFBundleDisplayName = "Micropolis Native";
- INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.simulation-games";
- INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright (C) 1989–2007 Electronic Arts Inc. (engine). Modified version 2026-10-22, GPL-3.0-or-later with EA additional terms.";
- CODE_SIGN_STYLE = Automatic; CODE_SIGN_IDENTITY = "-"; ENABLE_APP_SANDBOX = YES;
- ENABLE_HARDENED_RUNTIME = YES; COMBINE_HIDPI_IMAGES = YES;
- LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
- }; };
-		862894B703A6DEDF96A9DD6C = { isa = XCConfigurationList; buildConfigurations = (89E1FD6268CC0F221A2BE178, E6DE6C99132752C914FEF632,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
-		C57128001CE614BF8549D6BB = { isa = XCConfigurationList; buildConfigurations = (7082CC0B6FC1282FCEABD07A, 639A7CA24D39909E713B47F7,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
-		0E8A3AD980EC179856012B7E = { isa = PBXNativeTarget; buildConfigurationList = C57128001CE614BF8549D6BB; buildPhases = (72A8017E75795FC05F78F54C, F01580CCB5F725E4E879D491, 963488E8A773A44C9A5DC523,); buildRules = (); dependencies = (); name = MicropolisMac; packageProductDependencies = (DE58E2B17C19600779694943,); productName = MicropolisMac; productReference = 38A007151ABE87CC01A5B6E9; productType = "com.apple.product-type.application"; };
-		98F54143AB4E86B28C3AFEE0 = { isa = PBXProject; attributes = { LastUpgradeCheck = 2710; BuildIndependentTargetsInParallel = YES; }; buildConfigurationList = 862894B703A6DEDF96A9DD6C; compatibilityVersion = "Xcode 14.0"; developmentRegion = ja; knownRegions = (ja, en, Base,); mainGroup = EDA6D6223944636B9C5B54AA; productRefGroup = BFE00B156DCFC34C4751A6E5; projectDirPath = ""; projectRoot = ""; packageReferences = (582681C2EAE02B3F3D399C0C,); targets = (0E8A3AD980EC179856012B7E,); };
+	classes = {
 	};
-	rootObject = 98F54143AB4E86B28C3AFEE0;
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		11075E696DBBE098D1F27887 /* Rendering/TerrainCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09DF66CE408AD94B144320C8 /* Rendering/TerrainCanvas.swift */; };
+		1857FD00B1D099B3065BC917 /* Rendering/TileAtlas.swift in Sources */ = {isa = PBXBuildFile; fileRef = C61EDD12021B57C403ACF2BD /* Rendering/TileAtlas.swift */; };
+		2599678A41270F0B6996679A /* App/MicropolisMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FDB7AE0CA39F9E3ADEEB13A /* App/MicropolisMacApp.swift */; };
+		289A7174F8B4419D30D863CE /* Rendering/MapInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5DB426D8C36A5B26090A10 /* Rendering/MapInputView.swift */; };
+		289D331A391C5EE36C2B441A /* Views/LicenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1239705C289BCC35E1311AD /* Views/LicenseView.swift */; };
+		45B47B3617ACCA841E14A9FE /* Models/AppText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97623464B2514D4D91148E9F /* Models/AppText.swift */; };
+		484A619E8F7E1ECCCCEF22F5 /* ../../gpl-3.0.txt in Resources */ = {isa = PBXBuildFile; fileRef = F0046D3BB7295349AAFCDD05 /* ../../gpl-3.0.txt */; };
+		485A2A3EA30E644C4085E362 /* Services/CityWindowBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049F25DD1E5BD746C6D5A7FE /* Services/CityWindowBridge.swift */; };
+		48B81B38524EC824BE3D9F03 /* Views/CityPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46AEBE05645BAE23A04F20E4 /* Views/CityPanels.swift */; };
+		5B546E256D141CB24E34C7DD /* Rendering/TilePalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = C14A3EEF68A716A31768B9D0 /* Rendering/TilePalette.swift */; };
+		619E60F363C14488757C6BAB /* Views/CityStatusBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A87D6126F4350BDA76E8286 /* Views/CityStatusBar.swift */; };
+		74505E150940911E818520A5 /* Views/CityMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C151449BB01E3487D2E4CE8A /* Views/CityMapView.swift */; };
+		8059738FC1C706AD7B088EEE /* Services/EngineSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7344DC2E0A7E340AA5B4203 /* Services/EngineSession.swift */; };
+		83C0F812B4B39F1F2C197517 /* ../../MicropolisGPLLicenseNotice.md in Resources */ = {isa = PBXBuildFile; fileRef = 68F35E3DD144F3CC14506D98 /* ../../MicropolisGPLLicenseNotice.md */; };
+		95C84992B616AFFE0CE44245 /* ../../MicropolisPublicNameLicense.md in Resources */ = {isa = PBXBuildFile; fileRef = BA1022221120C7BD204DD650 /* ../../MicropolisPublicNameLicense.md */; };
+		9A48BCDE219E5204848DD51E /* Resources/Localization in Resources */ = {isa = PBXBuildFile; fileRef = 65591B3B302E7226A87D4B23 /* Resources/Localization */; };
+		B43B4C760196860E423F74E5 /* Rendering/MapGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 939A5EC6A5AD8359D3A68FF0 /* Rendering/MapGeometry.swift */; };
+		CB27C7810F9DDEBEB277DACB /* Models/CityFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D8D0C7B51B1EC8DD9A42575 /* Models/CityFrame.swift */; };
+		DB6EF2035DD922544108B6C5 /* Views/AppearanceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968AC7B86EC4AD9E69A53A5F /* Views/AppearanceSettings.swift */; };
+		E09815C304D59A81B99B991C /* Models/CityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 899FFDA063295108F4E1BF2F /* Models/CityModel.swift */; };
+		E9E95A31C0787A3CF6C6F25F /* Views/CitySidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7A4CCEBAADA1240A66171C /* Views/CitySidebar.swift */; };
+		EA6B228D3A19372208428B13 /* Services/CityFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B0E54B08F6DB22D3B85D8B /* Services/CityFiles.swift */; };
+		F178867DA2879CAE0F60630A /* MicropolisNative in Frameworks */ = {isa = PBXBuildFile; productRef = DE58E2B17C19600779694943 /* MicropolisNative */; };
+		F4536582308DE268007A4B12 /* Micropolis.icon in Resources */ = {isa = PBXBuildFile; fileRef = F4536581308DE268007A4B12 /* Micropolis.icon */; };
+		F57C618472332387FEC49EA7 /* Resources/OriginalGraphics in Resources */ = {isa = PBXBuildFile; fileRef = 5FA52C7DA733E5F5B65F4DDB /* Resources/OriginalGraphics */; };
+		F7D62745C80E00A1CEF8A549 /* Views/ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C1B79D4003562DEF224B48 /* Views/ContentView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		049F25DD1E5BD746C6D5A7FE /* Services/CityWindowBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/CityWindowBridge.swift; sourceTree = "<group>"; };
+		09DF66CE408AD94B144320C8 /* Rendering/TerrainCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rendering/TerrainCanvas.swift; sourceTree = "<group>"; };
+		1F7A4CCEBAADA1240A66171C /* Views/CitySidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CitySidebar.swift; sourceTree = "<group>"; };
+		2D8D0C7B51B1EC8DD9A42575 /* Models/CityFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/CityFrame.swift; sourceTree = "<group>"; };
+		2FDB7AE0CA39F9E3ADEEB13A /* App/MicropolisMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/MicropolisMacApp.swift; sourceTree = "<group>"; };
+		38A007151ABE87CC01A5B6E9 /* Micropolis for macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = "Micropolis for macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A87D6126F4350BDA76E8286 /* Views/CityStatusBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CityStatusBar.swift; sourceTree = "<group>"; };
+		46AEBE05645BAE23A04F20E4 /* Views/CityPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CityPanels.swift; sourceTree = "<group>"; };
+		5FA52C7DA733E5F5B65F4DDB /* Resources/OriginalGraphics */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources/OriginalGraphics; sourceTree = "<group>"; };
+		65591B3B302E7226A87D4B23 /* Resources/Localization */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources/Localization; sourceTree = "<group>"; };
+		68F35E3DD144F3CC14506D98 /* ../../MicropolisGPLLicenseNotice.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = ../../MicropolisGPLLicenseNotice.md; sourceTree = "<group>"; };
+		899FFDA063295108F4E1BF2F /* Models/CityModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/CityModel.swift; sourceTree = "<group>"; };
+		939A5EC6A5AD8359D3A68FF0 /* Rendering/MapGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rendering/MapGeometry.swift; sourceTree = "<group>"; };
+		968AC7B86EC4AD9E69A53A5F /* Views/AppearanceSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/AppearanceSettings.swift; sourceTree = "<group>"; };
+		97623464B2514D4D91148E9F /* Models/AppText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/AppText.swift; sourceTree = "<group>"; };
+		9F5DB426D8C36A5B26090A10 /* Rendering/MapInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rendering/MapInputView.swift; sourceTree = "<group>"; };
+		A2B0E54B08F6DB22D3B85D8B /* Services/CityFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/CityFiles.swift; sourceTree = "<group>"; };
+		B2C1B79D4003562DEF224B48 /* Views/ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ContentView.swift; sourceTree = "<group>"; };
+		BA1022221120C7BD204DD650 /* ../../MicropolisPublicNameLicense.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = ../../MicropolisPublicNameLicense.md; sourceTree = "<group>"; };
+		C1239705C289BCC35E1311AD /* Views/LicenseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/LicenseView.swift; sourceTree = "<group>"; };
+		C14A3EEF68A716A31768B9D0 /* Rendering/TilePalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rendering/TilePalette.swift; sourceTree = "<group>"; };
+		C151449BB01E3487D2E4CE8A /* Views/CityMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CityMapView.swift; sourceTree = "<group>"; };
+		C61EDD12021B57C403ACF2BD /* Rendering/TileAtlas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rendering/TileAtlas.swift; sourceTree = "<group>"; };
+		C7344DC2E0A7E340AA5B4203 /* Services/EngineSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/EngineSession.swift; sourceTree = "<group>"; };
+		F0046D3BB7295349AAFCDD05 /* ../../gpl-3.0.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "../../gpl-3.0.txt"; sourceTree = "<group>"; };
+		F4536581308DE268007A4B12 /* Micropolis.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = Micropolis.icon; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F01580CCB5F725E4E879D491 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F178867DA2879CAE0F60630A /* MicropolisNative in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3B91224C671A3400805ED16F /* Licenses */ = {
+			isa = PBXGroup;
+			children = (
+				F0046D3BB7295349AAFCDD05 /* ../../gpl-3.0.txt */,
+				68F35E3DD144F3CC14506D98 /* ../../MicropolisGPLLicenseNotice.md */,
+				BA1022221120C7BD204DD650 /* ../../MicropolisPublicNameLicense.md */,
+			);
+			name = Licenses;
+			sourceTree = "<group>";
+		};
+		4D820FADAFBC7A1FCACC4F07 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				3A87D6126F4350BDA76E8286 /* Views/CityStatusBar.swift */,
+				F4536581308DE268007A4B12 /* Micropolis.icon */,
+				65591B3B302E7226A87D4B23 /* Resources/Localization */,
+				968AC7B86EC4AD9E69A53A5F /* Views/AppearanceSettings.swift */,
+				1F7A4CCEBAADA1240A66171C /* Views/CitySidebar.swift */,
+				97623464B2514D4D91148E9F /* Models/AppText.swift */,
+				C61EDD12021B57C403ACF2BD /* Rendering/TileAtlas.swift */,
+				09DF66CE408AD94B144320C8 /* Rendering/TerrainCanvas.swift */,
+				5FA52C7DA733E5F5B65F4DDB /* Resources/OriginalGraphics */,
+				46AEBE05645BAE23A04F20E4 /* Views/CityPanels.swift */,
+				9F5DB426D8C36A5B26090A10 /* Rendering/MapInputView.swift */,
+				049F25DD1E5BD746C6D5A7FE /* Services/CityWindowBridge.swift */,
+				A2B0E54B08F6DB22D3B85D8B /* Services/CityFiles.swift */,
+				2FDB7AE0CA39F9E3ADEEB13A /* App/MicropolisMacApp.swift */,
+				2D8D0C7B51B1EC8DD9A42575 /* Models/CityFrame.swift */,
+				899FFDA063295108F4E1BF2F /* Models/CityModel.swift */,
+				939A5EC6A5AD8359D3A68FF0 /* Rendering/MapGeometry.swift */,
+				C14A3EEF68A716A31768B9D0 /* Rendering/TilePalette.swift */,
+				C7344DC2E0A7E340AA5B4203 /* Services/EngineSession.swift */,
+				C151449BB01E3487D2E4CE8A /* Views/CityMapView.swift */,
+				B2C1B79D4003562DEF224B48 /* Views/ContentView.swift */,
+				C1239705C289BCC35E1311AD /* Views/LicenseView.swift */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		BFE00B156DCFC34C4751A6E5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				38A007151ABE87CC01A5B6E9 /* Micropolis for macOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		EDA6D6223944636B9C5B54AA = {
+			isa = PBXGroup;
+			children = (
+				4D820FADAFBC7A1FCACC4F07 /* Sources */,
+				3B91224C671A3400805ED16F /* Licenses */,
+				BFE00B156DCFC34C4751A6E5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0E8A3AD980EC179856012B7E /* MicropolisMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C57128001CE614BF8549D6BB /* Build configuration list for PBXNativeTarget "MicropolisMac" */;
+			buildPhases = (
+				72A8017E75795FC05F78F54C /* Sources */,
+				F01580CCB5F725E4E879D491 /* Frameworks */,
+				963488E8A773A44C9A5DC523 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MicropolisMac;
+			packageProductDependencies = (
+				DE58E2B17C19600779694943 /* MicropolisNative */,
+			);
+			productName = MicropolisMac;
+			productReference = 38A007151ABE87CC01A5B6E9 /* Micropolis for macOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		98F54143AB4E86B28C3AFEE0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2710;
+			};
+			buildConfigurationList = 862894B703A6DEDF96A9DD6C /* Build configuration list for PBXProject "MicropolisMac" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = ja;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				ja,
+				en,
+				Base,
+			);
+			mainGroup = EDA6D6223944636B9C5B54AA;
+			packageReferences = (
+				582681C2EAE02B3F3D399C0C /* XCLocalSwiftPackageReference "../../packages/micropolis-engine" */,
+			);
+			productRefGroup = BFE00B156DCFC34C4751A6E5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0E8A3AD980EC179856012B7E /* MicropolisMac */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		963488E8A773A44C9A5DC523 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A48BCDE219E5204848DD51E /* Resources/Localization in Resources */,
+				F57C618472332387FEC49EA7 /* Resources/OriginalGraphics in Resources */,
+				484A619E8F7E1ECCCCEF22F5 /* ../../gpl-3.0.txt in Resources */,
+				83C0F812B4B39F1F2C197517 /* ../../MicropolisGPLLicenseNotice.md in Resources */,
+				95C84992B616AFFE0CE44245 /* ../../MicropolisPublicNameLicense.md in Resources */,
+				F4536582308DE268007A4B12 /* Micropolis.icon in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		72A8017E75795FC05F78F54C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				619E60F363C14488757C6BAB /* Views/CityStatusBar.swift in Sources */,
+				DB6EF2035DD922544108B6C5 /* Views/AppearanceSettings.swift in Sources */,
+				E9E95A31C0787A3CF6C6F25F /* Views/CitySidebar.swift in Sources */,
+				45B47B3617ACCA841E14A9FE /* Models/AppText.swift in Sources */,
+				1857FD00B1D099B3065BC917 /* Rendering/TileAtlas.swift in Sources */,
+				11075E696DBBE098D1F27887 /* Rendering/TerrainCanvas.swift in Sources */,
+				48B81B38524EC824BE3D9F03 /* Views/CityPanels.swift in Sources */,
+				289A7174F8B4419D30D863CE /* Rendering/MapInputView.swift in Sources */,
+				485A2A3EA30E644C4085E362 /* Services/CityWindowBridge.swift in Sources */,
+				EA6B228D3A19372208428B13 /* Services/CityFiles.swift in Sources */,
+				2599678A41270F0B6996679A /* App/MicropolisMacApp.swift in Sources */,
+				CB27C7810F9DDEBEB277DACB /* Models/CityFrame.swift in Sources */,
+				E09815C304D59A81B99B991C /* Models/CityModel.swift in Sources */,
+				B43B4C760196860E423F74E5 /* Rendering/MapGeometry.swift in Sources */,
+				5B546E256D141CB24E34C7DD /* Rendering/TilePalette.swift in Sources */,
+				8059738FC1C706AD7B088EEE /* Services/EngineSession.swift in Sources */,
+				74505E150940911E818520A5 /* Views/CityMapView.swift in Sources */,
+				F7D62745C80E00A1CEF8A549 /* Views/ContentView.swift in Sources */,
+				289D331A391C5EE36C2B441A /* Views/LicenseView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		639A7CA24D39909E713B47F7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = Micropolis;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = App/MicropolisMac.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				EXECUTABLE_NAME = MicropolisMac;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = App/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Micropolis for macOS";
+				INFOPLIST_KEY_CFBundleName = "Micropolis for macOS";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.simulation-games";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright (C) 1989–2007 Electronic Arts Inc. (engine). Modified version 2026-10-25, GPL-3.0-or-later with EA additional terms.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.micropolis.native.macos;
+				PRODUCT_NAME = "Micropolis for macOS";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		7082CC0B6FC1282FCEABD07A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = Micropolis;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = App/MicropolisMac.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				EXECUTABLE_NAME = MicropolisMac;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = App/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Micropolis for macOS";
+				INFOPLIST_KEY_CFBundleName = "Micropolis for macOS";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.simulation-games";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright (C) 1989–2007 Electronic Arts Inc. (engine). Modified version 2026-10-25, GPL-3.0-or-later with EA additional terms.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.micropolis.native.macos;
+				PRODUCT_NAME = "Micropolis for macOS";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		89E1FD6268CC0F221A2BE178 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		E6DE6C99132752C914FEF632 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		862894B703A6DEDF96A9DD6C /* Build configuration list for PBXProject "MicropolisMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				89E1FD6268CC0F221A2BE178 /* Debug */,
+				E6DE6C99132752C914FEF632 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C57128001CE614BF8549D6BB /* Build configuration list for PBXNativeTarget "MicropolisMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7082CC0B6FC1282FCEABD07A /* Debug */,
+				639A7CA24D39909E713B47F7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		582681C2EAE02B3F3D399C0C /* XCLocalSwiftPackageReference "../../packages/micropolis-engine" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../packages/micropolis-engine";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DE58E2B17C19600779694943 /* MicropolisNative */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 582681C2EAE02B3F3D399C0C /* XCLocalSwiftPackageReference "../../packages/micropolis-engine" */;
+			productName = MicropolisNative;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 98F54143AB4E86B28C3AFEE0 /* Project object */;
 }

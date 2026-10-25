@@ -1,10 +1,50 @@
-# Micropolis Native macOS — Gameplay / 1.0候補
+# Micropolis for macOS
 
-2026-10-22更新。既存Micropolis C++エンジンを使う、macOS 27以降・Apple Silicon向けの変更版です。Electronic Artsの製品ではありません。Swift 6 / SwiftUI / Canvasと既存のMicropolisNativeローカルSwift Packageを利用し、WebView・Electron・WASMは使用しません。
+A native macOS adaptation of the classic Micropolis city-building simulation,
+built with SwiftUI and the original C++ engine.
+
+非公式のmacOSネイティブ移植版です。Electronic Arts、元プロジェクト、Micropolis商標権者による公式リリースや推奨製品ではありません。既存MicropolisCore C++エンジンをローカルSwift Package経由で利用し、Java版MicropolisJ v2.0.0をゲーム機能の参考にしています。WebView・Electron・WebAssemblyは使用しません。
+
+- 対応環境：Apple Silicon **arm64**、**macOS 27.0以降**。Intel Macには対応しません。
+- 暫定バージョン：**Version 1.0 (Build 1)**。Aboutでは実際のInfo.plistの値を表示します。
+- ソースコード・ビルド手順：[Toshiyuki-Kanai/micropolis-native-macos](https://github.com/Toshiyuki-Kanai/micropolis-native-macos)。リポジトリ名は変更しません。
+- 元エンジン：[SimHacker/MicropolisCore](https://github.com/SimHacker/MicropolisCore)。元のコード・素材の権利表示を維持する変更版です。
+
+## 公開準備とインストール
+
+現在は公開準備中です。Developer ID署名・Apple公証・配布DMGの作成、および名称使用条件（GitHub Releasesでの使用を含む）の最終確認は未完了です。正式公開が承認済み、または配布物が公証済みであるとは扱いません。アイコンはユーザーがCanvaで制作し、Xcodeへ手動登録しています。素材の権利確認は未完了です。
+
+公開時の予定ファイルは `Micropolis for macOS.app` と `Micropolis-for-macOS-arm64.dmg` です。正式公開後は本リポジトリのGitHub Releasesから対象バージョンのDMGを取得し、DMGを開いてアプリをApplicationsへコピーして起動する手順を案内します。現在は署名・公証済みDMGの提供を保証しません。Gatekeeperの保護を無効化する手順は案内しません。
+
+## アプリアイコン
+
+ユーザーがCanvaで制作したPNG（1024×1024）を使用し、`Micropolis.icon/Assets/Micropolis.png`とIcon Composer形式の`Micropolis.icon/icon.json`を対応ソースに含めます。XcodeのMicropolisMacターゲットにResourcesとして登録し、Debug／ReleaseともApp Icon名を`Micropolis`に設定しています。登録済みの正本はアプリディレクトリ直下の`Micropolis.icon`です。
+
+これは制作・登録状況の記録です。Canva上で使用した各素材の出典、適用ライセンス、アイコン用途での利用、PNG原本をソースとして再配布できる条件の最終確認は未完了です。GPL公開版ゲーム素材の許諾を、この新しいアイコンに自動的に適用するものではありません。今回のGitHubソース反映を、名称・素材の確認完了やDMG公開の承認とは扱いません。
+
+## ソースからのビルド
+
+Xcode 27.1以降を使い、`MicropolisMac.xcodeproj`を開きます。ターゲット・Schemeは引き続き`MicropolisMac`です。内部実行ファイル名も`MicropolisMac`、Bundle IDは`org.micropolis.native.macos`を維持します。
+
+リポジトリルートからのビルド例（ローカル用アドホック署名）：
+
+```sh
+xcodebuild -project apps/micropolis-macos/MicropolisMac.xcodeproj \
+  -scheme MicropolisMac -configuration Debug \
+  -destination 'platform=macOS,arch=arm64' \
+  -derivedDataPath build/micropolis-macos build
+
+xcodebuild -project apps/micropolis-macos/MicropolisMac.xcodeproj \
+  -scheme MicropolisMac -configuration Release \
+  -destination 'platform=macOS,arch=arm64' \
+  -derivedDataPath build/micropolis-macos build
+```
+
+出力はそれぞれ `build/micropolis-macos/Build/Products/Debug/Micropolis for macOS.app` と `build/micropolis-macos/Build/Products/Release/Micropolis for macOS.app` です。空白を含むパスをシェルで使う場合は引用符で囲んでください。Releaseのビルド成功とDeveloper ID署名・公証の完了は別です。App Sandboxと既存のファイルアクセス権限は維持します。
 
 ## 起動と基本操作
 
-`MicropolisMac.xcodeproj`をXcode 27.1以降で開き、Scheme `MicropolisMac`、実行先`My Mac`で⌘R。起動時は地形を生成して停止状態で表示します。ローカル用アドホック署名、App Sandbox有効。配布用署名・公証は未設定です。
+XcodeでScheme `MicropolisMac`、実行先`My Mac`を選び⌘R。起動時は地形を生成して停止状態で表示します。ローカル用アドホック署名、App Sandbox有効。配布用署名・公証は未設定です。
 
 1. 空き地に道路を延ばし、道路に隣接する住宅・商業・工業地区を配置します。
 2. 石炭または原子力発電所を配置し、送電線で各地区へ接続します。
@@ -16,7 +56,7 @@
 
 ## ファイル操作
 
-**1.0はアプリ1プロセスにつき都市ウインドウ1つの単一ウインドウ方式です。** 新規・開く・最近の都市・Finderからのオープンは、現在の都市を未保存確認後に置き換えます。複数ファイルを渡した場合も同じウインドウで順に処理します。都市ウインドウを閉じた後は、ファイルメニューの新規／開く、またはウインドウメニューから再表示できます。ライセンス表示は別の補助ウインドウです。
+**1.0はアプリ1プロセスにつき都市ウインドウ1つの単一ウインドウ方式です。** 新規・開く・最近の都市・Finderからのオープンは、現在の都市を未保存確認後に置き換えます。複数ファイルを渡した場合も同じウインドウで順に処理します。都市ウインドウを閉じた後は、ファイルメニューの新規／開く、またはウインドウメニューから再表示できます。Aboutとライセンス表示は別の補助ウインドウです。
 
 - 新規都市：⌘N。現在の都市を置換します。未保存の建設・時間進行・設定変更があれば保存／キャンセル／保存しないを確認します。
 - 開く：⌘O。classic 27,120バイト、map+mop 51,120バイトの.ctyに対応。読込後は停止して開きます。
@@ -106,21 +146,31 @@ make -f packages/micropolis-engine/native.mk SANITIZE=1 -j4 \
 
 C++/C APIは既存回帰に加え、全15ツール、電力・人口成長、保存後のエンジン破棄・再生成・復元、財政設定、長時間tick、繰り返し読込、災害を検証します。Swiftは実際のEngineSession/CityModelを使い、ドラッグ費用・保存前入力処理・失敗保存保護・復元継続・パン／ズーム座標を検証します。既存Web/WASMの13ファイル・80テストも成功しました。
 
-## GUI確認と残る範囲
+## 既知の制限事項とGUI確認範囲
 
 **主要ゲームループはユーザーによる実機GUI確認済みです（2026-10-21）。** 新規都市、道路ドラッグ、住宅・商業・工業、発電所・送電線、シミュレーションと人口増加、パン・ズーム、税率・予算、保存、アプリ再起動後の読込と継続、未保存確認、保存パネルのキャンセルが正常との報告を受けました。これはユーザーによる実操作結果であり、Codexの自動試験とは区別します。複数都市ウインドウは1.0の仕様対象外です。
 
 中心となる受け入れ手順「新規→道路・RCI→発電・送電→成長→税率・予算変更→保存→終了→再起動して開く→継続」は確認済みです。最近使った都市、全15ツールと災害の個別操作、閉じた都市ウインドウの再表示など、報告に含まれない操作を実機確認済みとは扱いません。1.0候補としてソースを公開し、配布用署名・公証済みの製品とは区別します。
 
-MicropolisJ v2.0.0の公開機能に対応する各種マップ・履歴グラフ・区域調査・通知一覧・都市候補選択・難易度・手動年次予算・スプライト・効果音を追加しています。新しい機能の実機GUI受け入れは未完了です。Undo、自動保存、シナリオUI、地形編集UI、BGMは基準Java版にも公開ゲーム機能がないため追加しません。配布用署名・公証も今回の対象外です。長時間試験は328,000 tickの加速実行であり、数時間のGUI連続稼働を保証するものではありません。
+MicropolisJ v2.0.0の公開機能に対応する各種マップ・履歴グラフ・区域調査・通知一覧・都市候補選択・難易度・手動年次予算・スプライト・効果音を追加しています。以下に記載した実機報告に含まれない操作や、名称変更後のGUIは別途確認が必要です。Undo、自動保存、シナリオUI、地形編集UI、BGMは基準Java版にも公開ゲーム機能がないため追加しません。配布用署名・公証も今回の対象外です。長時間試験は328,000 tickの加速実行であり、数時間のGUI連続稼働を保証するものではありません。
 
 画像の出典・除外素材・タイル対応・今回の検証範囲は[グラフィック統合記録](../../documentation/notes/engine/native-macos-original-graphics.ja.md)を参照してください。2026-10-22、原画像版について建設・接続、パン・ピンチ、建設プレビュー、電力表示、アニメーションと停止・再開、保存後の継続、ライセンス画面がすべて正常とのユーザー実機確認を受けました。これは今回の原画像版での確認結果であり、Codexの自動試験とは区別します。
 
 ## ライセンス
 
+アプリメニューの「Micropolis for macOSについて」で正式名称・Version／Build・非公式移植版の説明・ソースURL・クレジットを表示します。「ライセンスとクレジット…」でも既存の帰属表示とライセンス原文を参照できます。
+
 GPL version 3 or laterおよびEA追加条件。元のエンジンはCopyright (C) 1989–2007 Electronic Arts Inc.。リポジトリルートのGPL・EA追加条件・名称ライセンスをそのままアプリに同梱し、アプリメニューの「ライセンスとクレジット…」から参照できます。無保証。対応するソースとビルド手順は本リポジトリに含まれます。
 
 Micropolis is a registered trademark of Micropolis Corporation (Micropolis GmbH) and is licensed here as a courtesy of the owner under the Micropolis Public Name License. <https://www.micropolis.com>
+
+### 対応ソースと公開バイナリの対応
+
+配布時は、バイナリをビルドしたものと**同じCommit**の対応ソースを公開します。同一GitHub ReleaseにリリースTag、完全なCommit ID、バージョン／ビルド番号、DMGとソースアーカイブへのリンク、SHA-256、ビルド環境を記載する方針です。最新mainへのリンクだけで済ませません。
+
+対応ソースにはSwiftアプリ、C++エンジン／C API、Xcode・Swift Package設定、必要な素材の原本、変換・ビルドスクリプト、ライセンス原文を含めます。GPL第6条に従う提供方法と取得可能性を公開前に確認します。署名用秘密鍵や認証情報は含めません。今回は公開用Tag・ソースアーカイブ・DMG・GitHub Releaseを作成していません。
+
+名称の帰属表示は個別許諾取得の主張ではありません。Micropolis Public Name Licenseの非商用利用・宣伝等の条件を含め、GitHub Releasesでの使用の最終確認は未完了です。正式公開の承認済みとは扱いません。
 
 ## 外観・言語と画面配置
 
